@@ -104,7 +104,7 @@ namespace LeagueSharp.SDK
                     origin = sourceScale.MaxHealth - sourceScale.Health;
                     break;
                 case DamageScalingType.BonusHealth:
-                    origin = ((AIHeroClient)sourceScale).AllShield;
+                    origin = ((AIHeroClient)sourceScale).AttackShield;
                     break;
                 case DamageScalingType.Armor:
                     origin = sourceScale.Armor;
@@ -112,24 +112,22 @@ namespace LeagueSharp.SDK
                 case DamageScalingType.MaxMana:
                     origin = sourceScale.MaxMana;
                     break;
-                    /*
-                    case DamageScalingType.BonusMana:
-                        origin = ((Obj_AI_Hero)sourceScale).BonusMana;
-                        break;
-                    */
+                case DamageScalingType.BonusMana:
+                    origin = ((AIHeroClient)sourceScale).MagicShield;
+                    break;
             }
 
             var dmg = origin
                       * (percent > 0 || percent < 0
                              ? (percent > 0 ? percent : 0)
                                + (spellBonus.ScalePer100Ap > 0
-                                      ? Math.Abs(source.TotalMagicalDamage / 100) * spellBonus.ScalePer100Ap
+                                      ? source.TotalMagicalDamage / 100 * spellBonus.ScalePer100Ap
                                       : 0)
                                + (spellBonus.ScalePer100BonusAd > 0
-                                      ? Math.Abs(source.FlatPhysicalDamageMod / 100) * spellBonus.ScalePer100BonusAd
+                                      ? source.FlatPhysicalDamageMod / 100 * spellBonus.ScalePer100BonusAd
                                       : 0)
                                + (spellBonus.ScalePer100Ad > 0
-                                      ? Math.Abs(source.TotalAttackDamage / 100) * spellBonus.ScalePer100Ad
+                                      ? source.TotalAttackDamage / 100 * spellBonus.ScalePer100Ad
                                       : 0)
                              : 0);
 

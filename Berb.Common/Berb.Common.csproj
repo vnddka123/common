@@ -106,8 +106,6 @@
     <Compile Include="LeagueSharp-Common\NativeMethods.cs" />
     <Compile Include="LeagueSharp-Common\ObjectManager.cs" />
     <Compile Include="LeagueSharp-Common\OnValueChangeEventArgs.cs" />
-    <Compile Include="LeagueSharp-Common\OrbwalkerEvents.cs" />
-    <Compile Include="LeagueSharp-Common\Orbwalking.cs" />
     <Compile Include="LeagueSharp-Common\OtherOrb.cs" />
     <Compile Include="LeagueSharp-Common\Packet.cs" />
     <Compile Include="LeagueSharp-Common\Prediction.cs" />

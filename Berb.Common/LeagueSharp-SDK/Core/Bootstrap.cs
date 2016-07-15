@@ -74,7 +74,7 @@ namespace LeagueSharp.SDK
             Logging.Write()(Enumerations.LogLevel.Info, "[SDK Bootstrap] GameObjects Initialized.");
 
             // Load Damages.
-            //Damage.Initialize();
+            Damage.Initialize();
             Logging.Write()(Enumerations.LogLevel.Info, "[SDK Bootstrap] Damage Library Initialized.");
 
             // Final notification.

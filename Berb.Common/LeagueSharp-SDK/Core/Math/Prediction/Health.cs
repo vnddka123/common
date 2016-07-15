@@ -93,8 +93,6 @@ namespace LeagueSharp.SDK
             HealthPredictionType type = HealthPredictionType.Default)
         {
             return EloBuddy.SDK.Prediction.Health.GetPrediction(unit, time);
-
-            //return type == HealthPredictionType.Simulated ? GetPredictionSimulated(unit, time) : GetPredictionDefault(unit, time, delay);
         }
 
         /// <summary>
