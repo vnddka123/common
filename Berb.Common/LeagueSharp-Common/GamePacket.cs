@@ -26,9 +26,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using EloBuddy;
-//using EloBuddy.SDK;
 using SharpDX;
+using EloBuddy;
 
 #endregion
 
@@ -40,42 +39,42 @@ namespace LeagueSharp.Common
     public class GamePacket
     {
         /// <summary>
-        ///     The _header
+        /// The _header
         /// </summary>
         private readonly byte _header;
 
         /// <summary>
-        ///     The binary reader.
+        /// The binary reader.
         /// </summary>
         private readonly BinaryReader Br;
 
         /// <summary>
-        ///     The binary writer
+        /// The binary writer
         /// </summary>
         private readonly BinaryWriter Bw;
 
         /// <summary>
-        ///     The memory stream.
+        /// The memory stream.
         /// </summary>
         private readonly MemoryStream Ms;
 
         /// <summary>
-        ///     The raw packet
+        /// The raw packet
         /// </summary>
         private readonly byte[] rawPacket;
 
         /// <summary>
-        ///     The channel
+        /// The channel
         /// </summary>
         public PacketChannel Channel = PacketChannel.C2S;
 
         /// <summary>
-        ///     The flags
+        /// The flags
         /// </summary>
         public PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="GamePacket" /> class.
+        /// Initializes a new instance of the <see cref="GamePacket"/> class.
         /// </summary>
         /// <param name="data">The data.</param>
         public GamePacket(byte[] data)
@@ -92,9 +91,9 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="GamePacket" /> class.
+        /// Initializes a new instance of the <see cref="GamePacket"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="GamePacketEventArgs" /> instance containing the event data.</param>
+        /// <param name="args">The <see cref="GamePacketEventArgs"/> instance containing the event data.</param>
         public GamePacket(GamePacketEventArgs args)
         {
             Block = false;
@@ -111,7 +110,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="GamePacket" /> class.
+        /// Initializes a new instance of the <see cref="GamePacket"/> class.
         /// </summary>
         /// <param name="header">The header.</param>
         /// <param name="channel">The channel.</param>
@@ -134,10 +133,10 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Gets the header.
+        /// Gets the header.
         /// </summary>
         /// <value>
-        ///     The header.
+        /// The header.
         /// </value>
         public byte Header
         {
@@ -145,10 +144,10 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Gets or sets the position.
+        /// Gets or sets the position.
         /// </summary>
         /// <value>
-        ///     The position.
+        /// The position.
         /// </value>
         public long Position
         {
@@ -163,15 +162,15 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="GamePacket" /> is block.
+        /// Gets or sets a value indicating whether this <see cref="GamePacket"/> is block.
         /// </summary>
         /// <value>
-        ///     <c>true</c> if block; otherwise, <c>false</c>.
+        ///   <c>true</c> if block; otherwise, <c>false</c>.
         /// </value>
         public bool Block { get; set; }
 
         /// <summary>
-        ///     Returns the packet size.
+        /// Returns the packet size.
         /// </summary>
         /// <returns></returns>
         public long Size()
@@ -180,7 +179,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Reads a byte from the packet and increases the position by 1.
+        /// Reads a byte from the packet and increases the position by 1.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns></returns>
@@ -191,7 +190,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Reads and returns a double byte.
+        /// Reads and returns a double byte.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns></returns>
@@ -202,7 +201,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Reads and returns a float.
+        /// Reads and returns a float.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns></returns>
@@ -213,7 +212,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Reads and returns an integer.
+        /// Reads and returns an integer.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns></returns>
@@ -224,7 +223,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Reads and returns a string.
+        /// Reads and returns a string.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns></returns>
@@ -248,7 +247,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Writes a byte.
+        /// Writes a byte.
         /// </summary>
         /// <param name="b">The byte.</param>
         /// <param name="repeat">Specifies how many times to write the packet.</param>
@@ -261,7 +260,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Writes a short.
+        /// Writes a short.
         /// </summary>
         /// <param name="s">The short.</param>
         public void WriteShort(short s)
@@ -270,7 +269,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Writes a float.
+        /// Writes a float.
         /// </summary>
         /// <param name="f">The float.</param>
         public void WriteFloat(float f)
@@ -279,7 +278,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Writes an integer.
+        /// Writes an integer.
         /// </summary>
         /// <param name="i">The integer.</param>
         public void WriteInteger(int i)
@@ -288,27 +287,27 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Writes the hex string as bytes to the packet.
+        /// Writes the hex string as bytes to the packet.
         /// </summary>
         /// <param name="hex">The hexadecimal string.</param>
         public void WriteHexString(string hex)
         {
             hex = hex.Replace(" ", string.Empty);
 
-            if (hex.Length%2 != 0)
+            if ((hex.Length % 2) != 0)
             {
                 hex = "0" + hex;
             }
 
             Bw.Write(
                 Enumerable.Range(0, hex.Length)
-                    .Where(x => x%2 == 0)
+                    .Where(x => x % 2 == 0)
                     .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
                     .ToArray());
         }
 
         /// <summary>
-        ///     Writes the string.
+        /// Writes the string.
         /// </summary>
         /// <param name="str">The string.</param>
         public void WriteString(string str)
@@ -317,7 +316,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the byte.
+        /// Searches for the byte.
         /// </summary>
         /// <param name="num">The number.</param>
         /// <returns></returns>
@@ -328,7 +327,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the short.
+        /// Searches for the short.
         /// </summary>
         /// <param name="num">The number.</param>
         /// <returns></returns>
@@ -338,7 +337,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the float.
+        /// Searches for the float.
         /// </summary>
         /// <param name="num">The number.</param>
         /// <returns></returns>
@@ -348,7 +347,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the integer.
+        /// Searches for the integer.
         /// </summary>
         /// <param name="num">The number.</param>
         /// <returns></returns>
@@ -358,7 +357,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the string.
+        /// Searches for the string.
         /// </summary>
         /// <param name="str">The string.</param>
         /// <returns></returns>
@@ -368,7 +367,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the hexadecimal string.
+        /// Searches for the hexadecimal string.
         /// </summary>
         /// <param name="hex">The hexadecimal string.</param>
         /// <returns></returns>
@@ -376,7 +375,7 @@ namespace LeagueSharp.Common
         {
             hex = hex.Replace(" ", string.Empty);
 
-            if (hex.Length%2 != 0)
+            if ((hex.Length % 2) != 0)
             {
                 hex = "0" + hex;
             }
@@ -384,13 +383,13 @@ namespace LeagueSharp.Common
             return
                 rawPacket.IndexOf(
                     Enumerable.Range(0, hex.Length)
-                        .Where(x => x%2 == 0)
+                        .Where(x => x % 2 == 0)
                         .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
                         .ToArray()).ToArray();
         }
 
         /// <summary>
-        ///     Searches for the object.
+        /// Searches for the object.
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <returns></returns>
@@ -405,7 +404,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches  forthe object.
+        /// Searches  forthe object.
         /// </summary>
         /// <param name="networkId">The network identifier.</param>
         /// <returns></returns>
@@ -415,7 +414,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the position.
+        /// Searches for the position.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns></returns>
@@ -429,11 +428,11 @@ namespace LeagueSharp.Common
                 return null;
             }
 
-            return new[] {x, y};
+            return new[] { x, y };
         }
 
         /// <summary>
-        ///     Searches for the position.
+        /// Searches for the position.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns></returns>
@@ -443,7 +442,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the position.
+        /// Searches for the position.
         /// </summary>
         /// <param name="unit">The unit.</param>
         /// <returns></returns>
@@ -453,7 +452,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the position.
+        /// Searches for the position.
         /// </summary>
         /// <param name="unit">The unit.</param>
         /// <returns></returns>
@@ -471,23 +470,23 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the game tile.
+        /// Searches for the game tile.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns></returns>
         public int[][] SearchGameTile(Vector2 position)
         {
             var tile = NavMesh.WorldToGrid(position.X, position.Y);
-            var cell = NavMesh.GetCell((short) tile.X, (short) tile.Y);
+            var cell = NavMesh.GetCell((short)tile.X, (short)tile.Y);
 
             var x = SearchShort(cell.GridX);
             var y = SearchShort(cell.GridY);
 
-            return new[] {x, y};
+            return new[] { x, y };
         }
 
         /// <summary>
-        ///     Searches for the game tile.
+        /// Searches for the game tile.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns></returns>
@@ -497,7 +496,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Searches for the game tile.
+        /// Searches for the game tile.
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <returns></returns>
@@ -507,7 +506,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Gets the raw packet.
+        /// Gets the raw packet.
         /// </summary>
         /// <returns></returns>
         public byte[] GetRawPacket()
@@ -516,7 +515,37 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Dumps the packet.
+        /// Sends the packet
+        /// </summary>
+        /// <param name="channel">The channel.</param>
+        /// <param name="flags">The flags.</param>
+        public void Send(PacketChannel channel = PacketChannel.C2S,
+            PacketProtocolFlags flags = PacketProtocolFlags.Reliable)
+        {
+            return; //Blocked for now 4.21
+            if (!Block)
+            {
+                Game.SendPacket(
+                    Ms.ToArray(), Channel == PacketChannel.C2S ? channel : Channel,
+                    Flags == PacketProtocolFlags.Reliable ? flags : Flags);
+            }
+        }
+
+        /// <summary>
+        /// Receives the packet.
+        /// </summary>
+        /// <param name="channel">The channel.</param>
+        public void Process(PacketChannel channel = PacketChannel.S2C)
+        {
+            return; //Blocked for now 4.21
+            if (!Block)
+            {
+                Game.ProcessPacket(Ms.ToArray(), channel);
+            }
+        }
+
+        /// <summary>
+        /// Dumps the packet.
         /// </summary>
         /// <param name="additionalInfo">if set to <c>true</c> writes additional information.</param>
         /// <returns></returns>
@@ -531,7 +560,7 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Saves the packet dump to a file
+        /// Saves the packet dump to a file
         /// </summary>
         /// <param name="filePath">The file path.</param>
         public void SaveToFile(string filePath)

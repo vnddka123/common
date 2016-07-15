@@ -29,464 +29,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using EloBuddy;
 using SharpDX;
+using EloBuddy;
 
 #endregion
 
 namespace LeagueSharp.Common
 {
+
     /// <summary>
-    ///     Helps in decoding packets. This is not currently updated past 4.21!
+    /// Helps in decoding packets. This is not currently updated past 4.21!
     /// </summary>
-    //[Obsolete("Jodus wears dirty socks", false)]
+    [Obsolete("Jodus wears dirty socks", false)]
     public static class Packet
     {
         /// <summary>
-        ///     The states of actions.
-        /// </summary>
-        public enum ActionStates
-        {
-            /// <summary>
-            ///     The begin recall state
-            /// </summary>
-            BeginRecall = 111207118,
-
-            /// <summary>
-            ///     The finish recall state
-            /// </summary>
-            FinishRecall = 97690254
-        }
-
-        /// <summary>
-        ///     The type of attack.
-        /// </summary>
-        public enum AttackTypePacket
-        {
-            /// <summary>
-            ///     Circular skillshots.
-            /// </summary>
-            Circular = 0,
-
-            /// <summary>
-            ///     Cone and Skillshot spells
-            /// </summary>
-            ConeSkillShot = 1,
-
-            /// <summary>
-            ///     Targeted spells and AAs
-            /// </summary>
-            TargetedAA = 2
-        }
-
-        /// <summary>
-        ///     The type of damage.
-        /// </summary>
-        public enum DamageTypePacket
-        {
-            /// <summary>
-            ///     Magical Damage (AP)
-            /// </summary>
-            Magical = 4,
-
-            /// <summary>
-            ///     A Critical Attack
-            /// </summary>
-            CriticalAttack = 11,
-
-            /// <summary>
-            ///     Physical Damage (AD)
-            /// </summary>
-            Physical = 12,
-
-            /// <summary>
-            ///     True Damage
-            /// </summary>
-            True = 36
-        }
-
-        /// <summary>
-        ///     Types of emotes.
-        /// </summary>
-        public enum Emotes
-        {
-            /// <summary>
-            ///     Dance
-            /// </summary>
-            Dance = 0x00,
-
-            /// <summary>
-            ///     Joke
-            /// </summary>
-            Joke = 0x03,
-
-            /// <summary>
-            ///     Taunt
-            /// </summary>
-            Taunt = 0x01,
-
-            /// <summary>
-            ///     Laugh
-            /// </summary>
-            Laugh = 0x02
-        }
-
-        /// <summary>
-        ///     Type of floating text on a hero.
-        /// </summary>
-        public enum FloatTextPacket
-        {
-            /// <summary>
-            ///     Invulnerable
-            /// </summary>
-            Invulnerable,
-
-            /// <summary>
-            ///     Special
-            /// </summary>
-            Special,
-
-            /// <summary>
-            ///     Heal
-            /// </summary>
-            Heal,
-
-            /// <summary>
-            ///     Mana heal
-            /// </summary>
-            ManaHeal,
-
-            /// <summary>
-            ///     Mana Damage
-            /// </summary>
-            ManaDmg,
-
-            /// <summary>
-            ///     Dodge
-            /// </summary>
-            Dodge,
-
-            /// <summary>
-            ///     Critical
-            /// </summary>
-            Critical,
-
-            /// <summary>
-            ///     Experience
-            /// </summary>
-            Experience,
-
-            /// <summary>
-            ///     Gold
-            /// </summary>
-            Gold,
-
-            /// <summary>
-            ///     Level
-            /// </summary>
-            Level,
-
-            /// <summary>
-            ///     Disable
-            /// </summary>
-            Disable,
-
-            /// <summary>
-            ///     Quest Received
-            /// </summary>
-            QuestRecv,
-
-            /// <summary>
-            ///     Quest Done
-            /// </summary>
-            QuestDone,
-
-            /// <summary>
-            ///     Score
-            /// </summary>
-            Score,
-
-            /// <summary>
-            ///     Physical Damage
-            /// </summary>
-            PhysDmg,
-
-            /// <summary>
-            ///     Magic Damage
-            /// </summary>
-            MagicDmg,
-
-            /// <summary>
-            ///     True Damage
-            /// </summary>
-            TrueDmg,
-
-            /// <summary>
-            ///     Enemy Physical Damage
-            /// </summary>
-            EnemyPhysDmg,
-
-            /// <summary>
-            ///     Enemy Magic Damage
-            /// </summary>
-            EnemyMagicDmg,
-
-            /// <summary>
-            ///     Enemy True Damage
-            /// </summary>
-            EnemyTrueDmg,
-
-            /// <summary>
-            ///     Enemy Critical
-            /// </summary>
-            EnemyCritical,
-
-            /// <summary>
-            ///     Countdown
-            /// </summary>
-            Countdown,
-
-            /// <summary>
-            ///     Legacy
-            /// </summary>
-            Legacy,
-
-            /// <summary>
-            ///     Legacy critical
-            /// </summary>
-            LegacyCritical,
-
-            /// <summary>
-            ///     Debug
-            /// </summary>
-            Debug
-        }
-
-        /// <summary>
-        ///     Because riot has run out of headers because they used byte headers, packets have 2 byte headers. This Enum
-        ///     represnets them.
-        /// </summary>
-        public enum MultiPacketType
-        {
-            /* Confirmed in IDA */
-
-            /// <summary>
-            ///     The unknown100
-            /// </summary>
-            Unknown100 = 0x00,
-
-            /// <summary>
-            ///     The unknown101
-            /// </summary>
-            Unknown101 = 0x01,
-
-            /// <summary>
-            ///     The unknown102
-            /// </summary>
-            Unknown102 = 0x02,
-
-            /// <summary>
-            ///     The unknown115
-            /// </summary>
-            Unknown115 = 0x15,
-
-            /// <summary>
-            ///     The unknown116
-            /// </summary>
-            Unknown116 = 0x16,
-
-            /// <summary>
-            ///     The unknown124
-            /// </summary>
-            Unknown124 = 0x24,
-
-            /// <summary>
-            ///     The unknown11 a
-            /// </summary>
-            Unknown11A = 0x1A,
-
-            /// <summary>
-            ///     The unknown11 e (Currently Empty)
-            /// </summary>
-            Unknown11E = 0x1E,
-
-            /* These others could be packets with a handler */
-
-            /// <summary>
-            ///     The unknown104. Somehow related to spell slots.
-            /// </summary>
-            Unknown104 = 0x04,
-
-            /// <summary>
-            ///     The unknown118. (Sion Ult)
-            /// </summary>
-            Unknown118 = 0x08,
-
-            /// <summary>
-            ///     The unknown120
-            /// </summary>
-            Unknown120 = 0x20, // confirmed in game
-
-            /// <summary>
-            ///     The spawn turret packet.
-            /// </summary>
-            SpawnTurret = 0x23, // confirmed in ida
-
-            /* New List: Confirmed in Game */
-            //FE 19 00 00 40 07 01 00 01 00 00 00 02 00 00 00 FF FF FF FF 00 00 00 00 00 00 00 00
-            /// <summary>
-            ///     The initialize spell pack. Could also be the stack count for stackables.
-            /// </summary>
-            InitSpell = 0x07,
-
-            /// <summary>
-            ///     The unknown10 c.
-            /// </summary>
-            Unknown10C = 0x0C, //this packet is like 0x127
-
-            /// <summary>
-            ///     The unknown122
-            /// </summary>
-            Unknown122 = 0x22,
-
-            /// <summary>
-            ///     The unknown125. (Sion Ult)
-            /// </summary>
-            Unknown125 = 0x25, // sion ult, other stuff
-            //FE 05 00 00 40 25 01 03 EC 06 00 00 00 01 <== sion
-            //            FE 19 00 00 40 25 01 00 00 07 00 00 00 06 FB 16 00 40 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 FB 16 00 40
-            //FE 19 00 00 40 25 01 00 00 07 00 00 00 06 FB 16 00 40 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 FB 16 00 40
-            //FE 19 00 00 40 25 01 00 00 07 00 00 00 06 FB 16 00 40 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 FB 16 00 40
-            //FE 19 00 00 40 25 01 00 00 07 00 00 00 06 FB 16 00 40 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 FB 16 00 40
-            //FE 19 00 00 40 25 01 00 00 07 00 00 00 06 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 56 05 00 40 FB 16 00 40
-
-            /// <summary>
-            ///     The NPC death packet
-            /// </summary>
-            NPCDeath = 0x26, //confirmed in ida, struct from intwars/ida
-
-            /// <summary>
-            ///     The unknown129. Related to spells.
-            /// </summary>
-            Unknown129 = 0x29, //related to spells (kalista ally unit), add?
-
-            /// <summary>
-            ///     The unknown12A. Related to  spells.
-            /// </summary>
-            Unknown12A = 0x2A, //related to spells (kalist ally unit after 0x129), maybe delete?
-
-            //FE 06 00 00 40 2A 01 3C 00 00 00
-            /// <summary>
-            ///     The unknown12 c
-            /// </summary>
-            Unknown12C = 0x2C,
-
-            //FE 00 00 00 00 2C 01 81 00 00 00 00 FF FF FF FF 
-            //FE 00 00 00 00 2C 01 80 00 00 00 00 FF FF FF FF 
-            /// <summary>
-            ///     The unknown12 e
-            /// </summary>
-            Unknown12E = 0x2E, //confirmed in ida
-
-            /// <summary>
-            ///     The unknown12 f
-            /// </summary>
-            Unknown12F = 0x2F, //FE 05 00 00 40 2F 01 00
-
-            /// <summary>
-            ///     The add buff packet.
-            /// </summary>
-            AddBuff = 0x09, // buff added by towers in new SR
-
-            /// <summary>
-            ///     The undo token packet
-            /// </summary>
-            UndoToken = 0x0B,
-
-            /// <summary>
-            ///     The object creation packet. Used for Azir's ult.
-            /// </summary>
-            ObjectCreation = 0x0D, // azir ult
-
-            /// <summary>
-            ///     The surrender state packet
-            /// </summary>
-            SurrenderState = 0x0E,
-
-            /// <summary>
-            ///     The on attack packet.
-            /// </summary>
-            OnAttack = 0x0F,
-
-            /// <summary>
-            ///     The death timer packet.
-            /// </summary>
-            DeathTimer = 0x17,
-
-            /// <summary>
-            ///     The change item packet. (EX: Health Potion to Biscuit)
-            /// </summary>
-            ChangeItem = 0x1C, //like hpp=>biscuit
-
-            /// <summary>
-            ///     The action state packet. Triggers on recall.
-            /// </summary>
-            ActionState = 0x21, // ?? triggers on recall
-
-            /// <summary>
-            ///     The undo confirmation packet.
-            /// </summary>
-            UndoConfirm = 0x27,
-
-            /// <summary>
-            ///     The lock camera packet for Sion's Ult.
-            /// </summary>
-            LockCamera = 0x2B, // Sion Ult
-
-            /// <summary>
-            ///     An unkown packet.
-            /// </summary>
-            Unknown = 0xFF // Default, not real packet
-        }
-
-        /// <summary>
-        ///     The type of ping.
-        /// </summary>
-        public enum PingType
-        {
-            /// <summary>
-            ///     A normal ping.
-            /// </summary>
-            Normal = 0,
-
-            /// <summary>
-            ///     A fallback ping.
-            /// </summary>
-            Fallback = 5,
-
-            /// <summary>
-            ///     An enemy missing ping.
-            /// </summary>
-            EnemyMissing = 3,
-
-            /// <summary>
-            ///     A danagr ping.
-            /// </summary>
-            Danger = 2,
-
-            /// <summary>
-            ///     An on my way ping.
-            /// </summary>
-            OnMyWay = 4,
-
-            /// <summary>
-            ///     An assist me ping.
-            /// </summary>
-            AssistMe = 6
-        }
-
-        /// <summary>
-        ///     Initializes static members of the <see cref="Packet" /> class.
+        /// Initializes static members of the <see cref="Packet"/> class.
         /// </summary>
         static Packet()
         {
@@ -494,34 +52,472 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Contains packets that are sent from the client (the game) to the server.
+        /// The states of actions.
+        /// </summary>
+        public enum ActionStates
+        {
+            /// <summary>
+            /// The begin recall state
+            /// </summary>
+            BeginRecall = 111207118,
+
+            /// <summary>
+            /// The finish recall state
+            /// </summary>
+            FinishRecall = 97690254,
+        }
+
+        /// <summary>
+        /// The type of attack.
+        /// </summary>
+        public enum AttackTypePacket
+        {
+            /// <summary>
+            /// Circular skillshots.
+            /// </summary>
+            Circular = 0,
+
+            /// <summary>
+            /// Cone and Skillshot spells
+            /// </summary>
+            ConeSkillShot = 1,
+
+            /// <summary>
+            /// Targeted spells and AAs
+            /// </summary>
+            TargetedAA = 2,
+        }
+
+        /// <summary>
+        /// The type of damage.
+        /// </summary>
+        public enum DamageTypePacket
+        {
+            /// <summary>
+            /// Magical Damage (AP)
+            /// </summary>
+            Magical = 4,
+
+            /// <summary>
+            /// A Critical Attack
+            /// </summary>
+            CriticalAttack = 11,
+
+            /// <summary>
+            /// Physical Damage (AD)
+            /// </summary>
+            Physical = 12,
+
+            /// <summary>
+            /// True Damage
+            /// </summary>
+            True = 36,
+        }
+
+        /// <summary>
+        /// Types of emotes.
+        /// </summary>
+        public enum Emotes
+        {
+            /// <summary>
+            /// Dance
+            /// </summary>
+            Dance = 0x00,
+
+            /// <summary>
+            /// Joke
+            /// </summary>
+            Joke = 0x03,
+
+            /// <summary>
+            /// Taunt
+            /// </summary>
+            Taunt = 0x01,
+
+            /// <summary>
+            /// Laugh
+            /// </summary>
+            Laugh = 0x02,
+        }
+
+        /// <summary>
+        /// Type of floating text on a hero.
+        /// </summary>
+        public enum FloatTextPacket
+        {
+            /// <summary>
+            /// Invulnerable
+            /// </summary>
+            Invulnerable,
+
+            /// <summary>
+            /// Special
+            /// </summary>
+            Special,
+
+            /// <summary>
+            /// Heal
+            /// </summary>
+            Heal,
+
+            /// <summary>
+            /// Mana heal
+            /// </summary>
+            ManaHeal,
+
+            /// <summary>
+            /// Mana Damage
+            /// </summary>
+            ManaDmg,
+
+            /// <summary>
+            /// Dodge
+            /// </summary>
+            Dodge,
+
+            /// <summary>
+            /// Critical
+            /// </summary>
+            Critical,
+
+            /// <summary>
+            /// Experience
+            /// </summary>
+            Experience,
+
+            /// <summary>
+            /// Gold
+            /// </summary>
+            Gold,
+
+            /// <summary>
+            /// Level
+            /// </summary>
+            Level,
+
+            /// <summary>
+            /// Disable
+            /// </summary>
+            Disable,
+
+            /// <summary>
+            /// Quest Received
+            /// </summary>
+            QuestRecv,
+
+            /// <summary>
+            /// Quest Done
+            /// </summary>
+            QuestDone,
+
+            /// <summary>
+            /// Score
+            /// </summary>
+            Score,
+
+            /// <summary>
+            /// Physical Damage
+            /// </summary>
+            PhysDmg,
+
+            /// <summary>
+            /// Magic Damage
+            /// </summary>
+            MagicDmg,
+
+            /// <summary>
+            /// True Damage
+            /// </summary>
+            TrueDmg,
+
+            /// <summary>
+            /// Enemy Physical Damage
+            /// </summary>
+            EnemyPhysDmg,
+
+            /// <summary>
+            /// Enemy Magic Damage
+            /// </summary>
+            EnemyMagicDmg,
+
+            /// <summary>
+            /// Enemy True Damage
+            /// </summary>
+            EnemyTrueDmg,
+
+            /// <summary>
+            /// Enemy Critical
+            /// </summary>
+            EnemyCritical,
+
+            /// <summary>
+            /// Countdown
+            /// </summary>
+            Countdown,
+
+            /// <summary>
+            /// Legacy
+            /// </summary>
+            Legacy,
+
+            /// <summary>
+            /// Legacy critical
+            /// </summary>
+            LegacyCritical,
+
+            /// <summary>
+            /// Debug
+            /// </summary>
+            Debug
+        }
+
+        /// <summary>
+        /// Because riot has run out of headers because they used byte headers, packets have 2 byte headers. This Enum represnets them.
+        /// </summary>
+        public enum MultiPacketType
+        {
+            /* Confirmed in IDA */
+            /// <summary>
+            /// The unknown100
+            /// </summary>
+            Unknown100 = 0x00,
+
+            /// <summary>
+            /// The unknown101
+            /// </summary>
+            Unknown101 = 0x01,
+
+            /// <summary>
+            /// The unknown102
+            /// </summary>
+            Unknown102 = 0x02,
+
+            /// <summary>
+            /// The unknown115
+            /// </summary>
+            Unknown115 = 0x15,
+
+            /// <summary>
+            /// The unknown116
+            /// </summary>
+            Unknown116 = 0x16,
+
+            /// <summary>
+            /// The unknown124
+            /// </summary>
+            Unknown124 = 0x24,
+
+            /// <summary>
+            /// The unknown11 a
+            /// </summary>
+            Unknown11A = 0x1A,
+
+            /// <summary>
+            /// The unknown11 e (Currently Empty)
+            /// </summary>
+            Unknown11E = 0x1E,
+
+            /* These others could be packets with a handler */
+            /// <summary>
+            /// The unknown104. Somehow related to spell slots.
+            /// </summary>
+            Unknown104 = 0x04,
+
+            /// <summary>
+            /// The unknown118. (Sion Ult)
+            /// </summary>
+            Unknown118 = 0x08,
+
+            /// <summary>
+            /// The unknown120
+            /// </summary>
+            Unknown120 = 0x20, // confirmed in game
+
+            /// <summary>
+            /// The spawn turret packet.
+            /// </summary>
+            SpawnTurret = 0x23, // confirmed in ida
+
+            /* New List: Confirmed in Game */
+            //FE 19 00 00 40 07 01 00 01 00 00 00 02 00 00 00 FF FF FF FF 00 00 00 00 00 00 00 00
+            /// <summary>
+            /// The initialize spell pack. Could also be the stack count for stackables.
+            /// </summary>
+            InitSpell = 0x07,
+
+            /// <summary>
+            /// The unknown10 c. 
+            /// </summary>
+            Unknown10C = 0x0C, //this packet is like 0x127
+
+            /// <summary>
+            /// The unknown122
+            /// </summary>
+            Unknown122 = 0x22,
+
+            /// <summary>
+            /// The unknown125. (Sion Ult)
+            /// </summary>
+            Unknown125 = 0x25, // sion ult, other stuff
+                               //FE 05 00 00 40 25 01 03 EC 06 00 00 00 01 <== sion
+                               //            FE 19 00 00 40 25 01 00 00 07 00 00 00 06 FB 16 00 40 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 FB 16 00 40
+                               //FE 19 00 00 40 25 01 00 00 07 00 00 00 06 FB 16 00 40 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 FB 16 00 40
+                               //FE 19 00 00 40 25 01 00 00 07 00 00 00 06 FB 16 00 40 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 FB 16 00 40
+                               //FE 19 00 00 40 25 01 00 00 07 00 00 00 06 FB 16 00 40 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 FB 16 00 40
+                               //FE 19 00 00 40 25 01 00 00 07 00 00 00 06 56 04 00 40 B2 04 00 40 B2 04 00 40 56 05 00 40 56 05 00 40 FB 16 00 40
+
+            /// <summary>
+            /// The NPC death packet
+            /// </summary>
+            NPCDeath = 0x26, //confirmed in ida, struct from intwars/ida
+            /// <summary>
+            /// The unknown129. Related to spells.
+            /// </summary>
+            Unknown129 = 0x29, //related to spells (kalista ally unit), add?
+            /// <summary>
+            /// The unknown12A. Related to  spells.
+            /// </summary>
+            Unknown12A = 0x2A, //related to spells (kalist ally unit after 0x129), maybe delete?
+
+            //FE 06 00 00 40 2A 01 3C 00 00 00
+            /// <summary>
+            /// The unknown12 c
+            /// </summary>
+            Unknown12C = 0x2C,
+
+            //FE 00 00 00 00 2C 01 81 00 00 00 00 FF FF FF FF 
+            //FE 00 00 00 00 2C 01 80 00 00 00 00 FF FF FF FF 
+            /// <summary>
+            /// The unknown12 e
+            /// </summary>
+            Unknown12E = 0x2E, //confirmed in ida
+
+            /// <summary>
+            /// The unknown12 f
+            /// </summary>
+            Unknown12F = 0x2F, //FE 05 00 00 40 2F 01 00
+
+            /// <summary>
+            /// The add buff packet.
+            /// </summary>
+            AddBuff = 0x09, // buff added by towers in new SR
+
+            /// <summary>
+            /// The undo token packet
+            /// </summary>
+            UndoToken = 0x0B,
+
+            /// <summary>
+            /// The object creation packet. Used for Azir's ult.
+            /// </summary>
+            ObjectCreation = 0x0D, // azir ult
+
+            /// <summary>
+            /// The surrender state packet
+            /// </summary>
+            SurrenderState = 0x0E,
+
+            /// <summary>
+            /// The on attack packet.
+            /// </summary>
+            OnAttack = 0x0F,
+
+            /// <summary>
+            /// The death timer packet.
+            /// </summary>
+            DeathTimer = 0x17,
+
+            /// <summary>
+            /// The change item packet. (EX: Health Potion to Biscuit)
+            /// </summary>
+            ChangeItem = 0x1C, //like hpp=>biscuit
+
+            /// <summary>
+            /// The action state packet. Triggers on recall.
+            /// </summary>
+            ActionState = 0x21, // ?? triggers on recall
+
+            /// <summary>
+            /// The undo confirmation packet.
+            /// </summary>
+            UndoConfirm = 0x27,
+
+            /// <summary>
+            /// The lock camera packet for Sion's Ult.
+            /// </summary>
+            LockCamera = 0x2B, // Sion Ult
+
+            /// <summary>
+            /// An unkown packet.
+            /// </summary>
+            Unknown = 0xFF, // Default, not real packet
+        }
+
+        /// <summary>
+        /// The type of ping.
+        /// </summary>
+        public enum PingType
+        {
+            /// <summary>
+            /// A normal ping.
+            /// </summary>
+            Normal = 0,
+
+            /// <summary>
+            /// A fallback ping.
+            /// </summary>
+            Fallback = 5,
+
+            /// <summary>
+            /// An enemy missing ping.
+            /// </summary>
+            EnemyMissing = 3,
+
+            /// <summary>
+            /// A danagr ping.
+            /// </summary>
+            Danger = 2,
+
+            /// <summary>
+            /// An on my way ping.
+            /// </summary>
+            OnMyWay = 4,
+
+            /// <summary>
+            /// An assist me ping.
+            /// </summary>
+            AssistMe = 6,
+        }
+
+        /// <summary>
+        /// Contains packets that are sent from the client (the game) to the server.
         /// </summary>
         public static class C2S
         {
             #region Ping - 4.21
 
             /// <summary>
-            ///     Ping Packet. Sent by the client when pings are sent.
+            /// Ping Packet. Sent by the client when pings are sent.
             /// </summary>
             public static class Ping
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x1D;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -533,49 +529,49 @@ namespace LeagueSharp.Common
                     result.WriteInteger(packetStruct.TargetNetworkId);
                     result.WriteFloat(packetStruct.X);
                     result.WriteFloat(packetStruct.Y);
-                    result.WriteByte((byte) packetStruct.Type);
+                    result.WriteByte((byte)packetStruct.Type);
                     return result;
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(byte[] data)
                 {
-                    var packet = new GamePacket(data) {Position = 10};
+                    var packet = new GamePacket(data) { Position = 10 };
                     return new Struct(
-                        packet.ReadFloat(), packet.ReadFloat(), packet.ReadInteger(), (PingType) packet.ReadByte());
+                        packet.ReadFloat(), packet.ReadFloat(), packet.ReadInteger(), (PingType)packet.ReadByte());
                 }
 
                 /// <summary>
-                ///     Repreents a ping packet.
+                /// Repreents a ping packet.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The target network identifier
+                    /// The target network identifier
                     /// </summary>
                     public int TargetNetworkId;
 
                     /// <summary>
-                    ///     The ping type
+                    /// The ping type
                     /// </summary>
                     public PingType Type;
 
                     /// <summary>
-                    ///     The x position
+                    /// The x position
                     /// </summary>
                     public float X;
 
                     /// <summary>
-                    ///     The y position
+                    /// The y position
                     /// </summary>
                     public float Y;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="x">The x.</param>
                     /// <param name="y">The y.</param>
@@ -596,27 +592,27 @@ namespace LeagueSharp.Common
             #region LevelUpSpell - 4.21
 
             /// <summary>
-            ///     Packet sent when leveling up a spell.
+            /// Packet sent when leveling up a spell.
             /// </summary>
             public static class LevelUpSpell
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xEC;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -626,8 +622,8 @@ namespace LeagueSharp.Common
                     result.WriteByte(0);
                     result.WriteInteger(packetStruct.NetworkId);
                     result.WriteInteger(0);
-                    result.WriteByte((byte) packetStruct.Slot);
-                    var bit = packetStruct.Evolution ? (byte) 0x01 : (byte) 0x0;
+                    result.WriteByte((byte)packetStruct.Slot);
+                    var bit = packetStruct.Evolution ? (byte)0x01 : (byte)0x0;
                     result.WriteByte(bit);
                     result.WriteInteger(0);
                     result.WriteInteger(0);
@@ -635,46 +631,52 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(byte[] data)
                 {
-                    var packet = new GamePacket(data) {Position = 2};
+                    var packet = new GamePacket(data) { Position = 2 };
+                    var result = new Struct();
+
+                    result.NetworkId = packet.ReadInteger();
                     packet.Position += 4;
-                    return new Struct(packet.ReadInteger(), (SpellSlot) packet.ReadByte());
+                    result.Slot = (SpellSlot)packet.ReadByte();
+                    result.Evolution = packet.ReadByte() == 0x01 ? true : false;
+
+                    return new Struct(packet.ReadInteger(), (SpellSlot)packet.ReadByte());
                 }
 
                 /// <summary>
-                ///     Represents a level up packet.
+                /// Represents a level up packet.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     <c>true</c> if the level up was to evolve a spell.
+                    /// <c>true</c> if the level up was to evolve a spell.
                     /// </summary>
                     public bool Evolution;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The slot
+                    /// The slot
                     /// </summary>
                     public SpellSlot Slot;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="networkId">The network identifier.</param>
                     /// <param name="slot">The slot.</param>
                     /// <param name="evolve">if set to <c>true</c> [evolve].</param>
                     public Struct(int networkId = -1, SpellSlot slot = SpellSlot.Q, bool evolve = false)
                     {
-                        NetworkId = networkId == -1 ? ObjectManager.Player.NetworkId : networkId;
+                        NetworkId = (networkId == -1) ? ObjectManager.Player.NetworkId : networkId;
                         Slot = slot;
                         Evolution = evolve;
                     }
@@ -686,17 +688,17 @@ namespace LeagueSharp.Common
             #region Move
 
             /// <summary>
-            ///     Packet sent when issuing GameObjectOrder's.
+            /// Packet sent when issuing GameObjectOrder's.
             /// </summary>
             public static class Move
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x13;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -720,7 +722,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -745,47 +747,47 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents a move packet.
+                /// Represents a move packet.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The move type
+                    /// The move type
                     /// </summary>
                     public byte MoveType;
 
                     /// <summary>
-                    ///     The source network identifier
+                    /// The source network identifier
                     /// </summary>
                     public int SourceNetworkId;
 
                     /// <summary>
-                    ///     The target network identifier
+                    /// The target network identifier
                     /// </summary>
                     public int TargetNetworkId;
 
                     /// <summary>
-                    ///     The unit network identifier
+                    /// The unit network identifier
                     /// </summary>
                     public int UnitNetworkId;
 
                     /// <summary>
-                    ///     The waypoint count
+                    /// The waypoint count
                     /// </summary>
                     public int WaypointCount;
 
                     /// <summary>
-                    ///     The x position
+                    /// The x position
                     /// </summary>
                     public float X;
 
                     /// <summary>
-                    ///     The y position
+                    /// The y position
                     /// </summary>
                     public float Y;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="x">The x.</param>
                     /// <param name="y">The y.</param>
@@ -800,12 +802,12 @@ namespace LeagueSharp.Common
                         int unitNetworkId = -1,
                         int sourceNetworkId = -1)
                     {
-                        SourceNetworkId = sourceNetworkId == -1 ? ObjectManager.Player.NetworkId : sourceNetworkId;
+                        SourceNetworkId = (sourceNetworkId == -1) ? ObjectManager.Player.NetworkId : sourceNetworkId;
                         MoveType = moveType;
                         X = x;
                         Y = y;
                         TargetNetworkId = targetNetworkId;
-                        UnitNetworkId = unitNetworkId == -1 ? ObjectManager.Player.NetworkId : unitNetworkId;
+                        UnitNetworkId = (unitNetworkId == -1) ? ObjectManager.Player.NetworkId : unitNetworkId;
                         WaypointCount = 1;
                     }
                 }
@@ -816,27 +818,25 @@ namespace LeagueSharp.Common
             #region Cast - 4.21
 
             /// <summary>
-            ///     Packet sent when casting spells.
+            /// Packet sent when casting spells.
             /// </summary>
             public static class Cast
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xDE;
-
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
-
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -850,14 +850,13 @@ namespace LeagueSharp.Common
                     result.WriteFloat(packetStruct.ToX);
                     result.WriteFloat(packetStruct.ToY);
                     result.WriteInteger(packetStruct.TargetNetworkId);
-                    result.WriteByte((byte) packetStruct.Slot);
-                    result.WriteByte(0);
-                        //packetStruct.SpellFlag == 0xFF ? GetSpellByte(packetStruct.Slot) : packetStruct.SpellFlag
+                    result.WriteByte((byte)packetStruct.Slot);
+                    result.WriteByte(0); //packetStruct.SpellFlag == 0xFF ? GetSpellByte(packetStruct.Slot) : packetStruct.SpellFlag
                     return result;
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -871,13 +870,13 @@ namespace LeagueSharp.Common
                     result.FromY = packet.ReadFloat();
                     result.ToX = packet.ReadFloat();
                     result.ToY = packet.ReadFloat();
-                    result.Slot = (SpellSlot) packet.ReadByte();
+                    result.Slot = (SpellSlot)packet.ReadByte();
                     result.SpellFlag = packet.ReadByte();
                     return result;
                 }
 
                 /// <summary>
-                ///     Gets the spell byte.
+                /// Gets the spell byte.
                 /// </summary>
                 /// <param name="spell">The spell.</param>
                 /// <returns>System.Byte.</returns>
@@ -917,52 +916,52 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents a spell cast packet.
+                /// Represents a spell cast packet.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The X position of where the spell came from.
+                    /// The X position of where the spell came from.
                     /// </summary>
                     public float FromX;
 
                     /// <summary>
-                    ///     The Y position of where the spell came from.
+                    /// The Y position of where the spell came from.
                     /// </summary>
                     public float FromY;
 
                     /// <summary>
-                    ///     The slot
+                    /// The slot
                     /// </summary>
                     public SpellSlot Slot;
 
                     /// <summary>
-                    ///     The source network identifier
+                    /// The source network identifier
                     /// </summary>
                     public int SourceNetworkId;
 
                     /// <summary>
-                    ///     The spell flag
+                    /// The spell flag
                     /// </summary>
                     public byte SpellFlag;
 
                     /// <summary>
-                    ///     The target network identifier
+                    /// The target network identifier
                     /// </summary>
                     public int TargetNetworkId;
 
                     /// <summary>
-                    ///     The end X position of where the spell is going to.
+                    /// The end X position of where the spell is going to.
                     /// </summary>
                     public float ToX;
 
                     /// <summary>
-                    ///     To end Y position of where the spell is going to.
+                    /// To end Y position of where the spell is going to.
                     /// </summary>
                     public float ToY;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="targetNetworkId">The target network identifier.</param>
                     /// <param name="slot">The slot.</param>
@@ -981,7 +980,7 @@ namespace LeagueSharp.Common
                         float toY = 0f,
                         byte spellFlag = 0xFF)
                     {
-                        SourceNetworkId = sourceNetworkId == -1 ? ObjectManager.Player.NetworkId : sourceNetworkId;
+                        SourceNetworkId = (sourceNetworkId == -1) ? ObjectManager.Player.NetworkId : sourceNetworkId;
                         Slot = slot;
                         FromX = fromX;
                         FromY = fromY;
@@ -998,27 +997,27 @@ namespace LeagueSharp.Common
             #region ChargedCast - 4.21
 
             /// <summary>
-            ///     Packet sent when casting charged spells second cast.
+            /// Packet sent when casting charged spells second cast.
             /// </summary>
             public static class ChargedCast
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x03;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -1027,7 +1026,7 @@ namespace LeagueSharp.Common
                     var result = new GamePacket(Header);
                     result.WriteByte(1);
                     result.WriteInteger(packetStruct.SourceNetworkId);
-                    result.WriteByte((byte) packetStruct.Slot);
+                    result.WriteByte((byte)packetStruct.Slot);
                     result.WriteFloat(packetStruct.ToX);
                     result.WriteFloat(packetStruct.ToY);
                     result.WriteFloat(packetStruct.ToZ);
@@ -1036,7 +1035,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -1046,7 +1045,7 @@ namespace LeagueSharp.Common
                     var result = new Struct();
                     packet.Position = 2;
                     result.SourceNetworkId = packet.ReadInteger();
-                    result.Slot = (SpellSlot) packet.ReadByte();
+                    result.Slot = (SpellSlot)packet.ReadByte();
                     result.ToX = packet.ReadFloat();
                     result.ToY = packet.ReadFloat();
                     result.ToZ = packet.ReadFloat();
@@ -1054,38 +1053,38 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents a charged cast packet.
+                /// Represents a charged cast packet.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The slot
+                    /// The slot
                     /// </summary>
                     public SpellSlot Slot;
 
                     /// <summary>
-                    ///     The source network identifier
+                    /// The source network identifier
                     /// </summary>
                     public int SourceNetworkId;
 
                     /// <summary>
-                    ///     The X position of where the spell is going to.
+                    /// The X position of where the spell is going to.
                     /// </summary>
                     public float ToX;
 
                     /// <summary>
-                    ///     The Y position of where the spell is going to.
+                    /// The Y position of where the spell is going to.
                     /// </summary>
                     public float ToY;
 
                     /// <summary>
-                    ///     The Z position of where the spell is going to.
+                    /// The Z position of where the spell is going to.
                     /// </summary>
                     public float ToZ;
 
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="slot">The slot.</param>
                     /// <param name="toX">To x.</param>
@@ -1098,7 +1097,7 @@ namespace LeagueSharp.Common
                         float toZ = 0f,
                         int sourceNetworkId = -1)
                     {
-                        SourceNetworkId = sourceNetworkId == -1 ? ObjectManager.Player.NetworkId : sourceNetworkId;
+                        SourceNetworkId = (sourceNetworkId == -1) ? ObjectManager.Player.NetworkId : sourceNetworkId;
                         Slot = slot;
                         ToX = toX;
                         ToY = toY;
@@ -1112,27 +1111,27 @@ namespace LeagueSharp.Common
             #region BuyItem - 4.21
 
             /// <summary>
-            ///     Packet sent when buying items.
+            /// Packet sent when buying items.
             /// </summary>
             public static class BuyItem
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xC6;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -1146,7 +1145,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -1161,22 +1160,22 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Reprents the packet sent when an item is bought.
+                /// Reprents the packet sent when an item is bought.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The item identifier
+                    /// The item identifier
                     /// </summary>
                     public int ItemId;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="itemId">The item identifier.</param>
                     /// <param name="networkId">The network identifier.</param>
@@ -1193,27 +1192,27 @@ namespace LeagueSharp.Common
             #region SellItem - 4.21
 
             /// <summary>
-            ///     Packet sent when selling items.
+            /// Packet sent when selling items.
             /// </summary>
             public static class SellItem
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x72;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -1228,13 +1227,13 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(byte[] data)
                 {
-                    var packet = new GamePacket(data) {Position = 2};
+                    var packet = new GamePacket(data) { Position = 2 };
                     var networkId = packet.ReadInteger();
                     var slot = packet.ReadByte();
 
@@ -1242,47 +1241,47 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Packet sent on selling an item.
+                /// Packet sent on selling an item.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The inventory slot
+                    /// The inventory slot
                     /// </summary>
                     public byte InventorySlot;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The spell slot
+                    /// The spell slot
                     /// </summary>
                     public SpellSlot SpellSlot;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="slot">The slot.</param>
                     /// <param name="networkId">The network identifier.</param>
                     public Struct(byte slot, int networkId = -1)
                     {
                         InventorySlot = slot;
-                        SpellSlot = (SpellSlot) (InventorySlot + (byte) SpellSlot.Item1);
+                        SpellSlot = (SpellSlot)(InventorySlot + (byte)SpellSlot.Item1);
                         NetworkId = networkId == -1 ? ObjectManager.Player.NetworkId : networkId;
                     }
 
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="slot">The slot.</param>
                     /// <param name="networkId">The network identifier.</param>
                     public Struct(SpellSlot slot, int networkId = -1)
                     {
                         SpellSlot = slot;
-                        InventorySlot = (byte) ((byte) SpellSlot - (byte) SpellSlot.Item1);
+                        InventorySlot = (byte)((byte)SpellSlot - (byte)SpellSlot.Item1);
                         NetworkId = networkId == -1 ? ObjectManager.Player.NetworkId : networkId;
                     }
                 }
@@ -1293,27 +1292,27 @@ namespace LeagueSharp.Common
             #region SwapItem - 4.21
 
             /// <summary>
-            ///     Packet sent when swapping items.
+            /// Packet sent when swapping items.
             /// </summary>
             public static class SwapItem
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x55;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -1328,7 +1327,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -1344,27 +1343,27 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet sent when you swap an item in your inventory.
+                /// Represents the packet sent when you swap an item in your inventory.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     From slot byte
+                    /// From slot byte
                     /// </summary>
                     public byte FromSlotByte;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     To slot byte
+                    /// To slot byte
                     /// </summary>
                     public byte ToSlotByte;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="fromSlotByte">From slot byte.</param>
                     /// <param name="toSlotByte">To slot byte.</param>
@@ -1383,27 +1382,27 @@ namespace LeagueSharp.Common
             #region Emote - 4.21
 
             /// <summary>
-            ///     Packet sent when sending emotes.
+            /// Packet sent when sending emotes.
             /// </summary>
             public static class Emote
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x14;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -1417,7 +1416,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -1432,22 +1431,22 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet sent when you cast an emote.
+                /// Represents the packet sent when you cast an emote.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The emote identifier
+                    /// The emote identifier
                     /// </summary>
                     public byte EmoteId;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="emoteId">The emote identifier.</param>
                     /// <param name="networkId">The network identifier.</param>
@@ -1464,27 +1463,27 @@ namespace LeagueSharp.Common
             #region InteractObject - 4.21
 
             /// <summary>
-            ///     Packet sent when interacting with Thresh Lantern and Dominion capturing.
+            /// Packet sent when interacting with Thresh Lantern and Dominion capturing.
             /// </summary>
             public static class InteractObject
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x86;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -1497,7 +1496,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -1512,22 +1511,21 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet sent when you interact with an object.
+                /// Represents the packet sent when you interact with an object.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The object network identifier
+                    /// The object network identifier
                     /// </summary>
                     public int ObjectNetworkId;
-
                     /// <summary>
-                    ///     The source network identifier
+                    /// The source network identifier
                     /// </summary>
                     public int SourceNetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="networkId">The network identifier.</param>
                     /// <param name="objectNetworkId">The object network identifier.</param>
@@ -1544,49 +1542,48 @@ namespace LeagueSharp.Common
             #region SetTarget - 4.21
 
             /// <summary>
-            ///     Packet sent when left clicking a target.
+            /// Packet sent when left clicking a target.
             /// </summary>
             public static class SetTarget
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x04;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(byte[] data)
                 {
-                    var result = new Struct {NetworkId = new GamePacket(data).ReadInteger(6)};
-                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.NetworkId);
+                    var result = new Struct { NetworkId = new GamePacket(data).ReadInteger(6) };
+                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.NetworkId);
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet sent when left clicking a target.
+                /// Represents the packet sent when left clicking a target.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
-
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public Obj_AI_Base Unit;
                 }
@@ -1597,40 +1594,39 @@ namespace LeagueSharp.Common
             #region HeartBeat - 4.21
 
             /// <summary>
-            ///     Packet sent frequently as heartbeat to servers.
-            ///     Related to 0x29 (Recv)
+            /// Packet sent frequently as heartbeat to servers.
+            /// Related to 0x29 (Recv)
             /// </summary>
             public static class HeartBeat
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x4C;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(byte[] data)
                 {
                     var packet = new GamePacket(data);
-                    var result = new Struct {RecvTime = packet.ReadFloat(1), AckTime = packet.ReadFloat(5)};
+                    var result = new Struct { RecvTime = packet.ReadFloat(1), AckTime = packet.ReadFloat(5) };
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents a heart beat packet.
+                /// Represents a heart beat packet.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The ack time
+                    /// The ack time
                     /// </summary>
                     public float AckTime;
-
                     /// <summary>
-                    ///     The recv time
+                    /// The recv time
                     /// </summary>
                     public float RecvTime;
                 }
@@ -1641,34 +1637,34 @@ namespace LeagueSharp.Common
             #region UpdateConfirm
 
             /// <summary>
-            ///     Packet sent to acknowledge the received update packet.
+            /// Packet sent to acknowledge the received update packet.
             /// </summary>
             public static class UpdateConfirm
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xA8;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(byte[] data)
                 {
                     var packet = new GamePacket(data);
-                    var result = new Struct {SequenceId = packet.ReadInteger(5)};
+                    var result = new Struct { SequenceId = packet.ReadInteger(5) };
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet sent to acknowledge the received update packet
+                /// Represents the packet sent to acknowledge the received update packet
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The sequence identifier
+                    /// The sequence identifier
                     /// </summary>
                     public int SequenceId;
                 }
@@ -1679,27 +1675,27 @@ namespace LeagueSharp.Common
             #region Refund - 4.21
 
             /// <summary>
-            ///     Sent by client on refund.
+            /// Sent by client on refund.
             /// </summary>
             public static class Refund
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x54;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -1712,7 +1708,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -1726,17 +1722,17 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet sent when refunding an item.
+                /// Represents the packet sent when refunding an item.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="networkId">The network identifier.</param>
                     public Struct(int networkId = -1)
@@ -1751,12 +1747,12 @@ namespace LeagueSharp.Common
             #region ScoreScreen - 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Sent by client on opening score screen.
+            /// Sent by client on opening score screen.
             /// </summary>
             public static class ScoreScreen
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x15;
             }
@@ -1766,12 +1762,12 @@ namespace LeagueSharp.Common
             #region Camera - 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Sent by client on center/lock camera.
+            /// Sent by client on center/lock camera.
             /// </summary>
             public static class Camera
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x64;
             }
@@ -1781,12 +1777,12 @@ namespace LeagueSharp.Common
             #region Zoom - 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Sent by client on zoom level change or move camera.
+            /// Sent by client on zoom level change or move camera.
             /// </summary>
             public static class Zoom
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xDC;
             }
@@ -1796,13 +1792,13 @@ namespace LeagueSharp.Common
             #region LeaveGame - 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Sent by client on exiting the game.
+            /// Sent by client on exiting the game.
             /// </summary>
             public static class LeaveGame
             {
                 //75 00 00 00 00 00 5A
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x75;
             }
@@ -1812,13 +1808,13 @@ namespace LeagueSharp.Common
             #region Surrender - 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Sent by client on surrendering.
+            /// Sent by client on surrendering.
             /// </summary>
             public static class Surrender
             {
                 //A2 00 00 00 00 00 AB
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xA2;
             }
@@ -1828,13 +1824,13 @@ namespace LeagueSharp.Common
             #region EndGame - 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Sent by client when the game is over.
+            /// Sent by client when the game is over.
             /// </summary>
             public static class EndGame
             {
                 //1E 00 00 00 00 00
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x1E;
             }
@@ -1844,13 +1840,13 @@ namespace LeagueSharp.Common
             #region WaypointConfirm 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Sent by client to confirm receiving waypoints.
+            /// Sent by client to confirm receiving waypoints.
             /// </summary>
             public static class WaypointConfirm
             {
                 //36 00 00 00 00 00 83 7F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x36;
             }
@@ -1860,29 +1856,30 @@ namespace LeagueSharp.Common
             #region Pause 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Sent by client on pause.
+            /// Sent by client on pause.
             /// </summary>
             public static class Pause
             {
                 //00 01 00 00 00 00 00 00 00 00 00 00 00 00 90 
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x00;
             }
 
             #endregion
 
+
             #region Resume 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Sent by client on resume.
+            /// Sent by client on resume.
             /// </summary>
             public static class Resume
             {
                 //19 00 00 00 00 00 00 00 00 00 90  
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x19;
             }
@@ -1891,34 +1888,34 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
-        ///     Contains packet that are sent from the server to the client (the game).
+        /// Contains packet that are sent from the server to the client (the game).
         /// </summary>
         public static class S2C
         {
             #region Ping - 4.21
 
             /// <summary>
-            ///     RPing Packet. Received when ally team players send a SPing packet.
+            /// RPing Packet. Received when ally team players send a SPing packet.
             /// </summary>
             public static class Ping
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x60;
 
                 /// <summary>
-                ///     The channel
+                /// The channel
                 /// </summary>
                 public static PacketChannel Channel = PacketChannel.C2S;
 
                 /// <summary>
-                ///     The flags
+                /// The flags
                 /// </summary>
                 public static PacketProtocolFlags Flags = PacketProtocolFlags.Reliable;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -1928,23 +1925,23 @@ namespace LeagueSharp.Common
                     result.WriteByte(0);
                     result.WriteInteger(0);
                     result.WriteInteger(packetStruct.TargetNetworkId);
-                    result.WriteByte((byte) packetStruct.Type);
+                    result.WriteByte((byte)packetStruct.Type);
                     result.WriteInteger(packetStruct.SourceNetworkId);
                     result.WriteFloat(packetStruct.X);
                     result.WriteFloat(packetStruct.Y);
-                    var bit = packetStruct.Silent ? (byte) 0x14 : (byte) 0x1B;
+                    var bit = packetStruct.Silent ? (byte)0x14 : (byte)0x1B;
                     result.WriteByte(bit);
                     return result;
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(byte[] data)
                 {
-                    var packet = new GamePacket(data) {Position = 6};
+                    var packet = new GamePacket(data) { Position = 6 };
                     var targetNetworkId = packet.ReadInteger();
                     var type = packet.ReadByte();
                     var sourceNetworkId = packet.ReadInteger();
@@ -1953,46 +1950,46 @@ namespace LeagueSharp.Common
                     var silent = (packet.ReadByte() & 1) != 1;
                     return new Struct(
                         x, y, targetNetworkId, sourceNetworkId,
-                        (PingType) type, silent);
+                        (PingType)type, silent);
                 }
 
                 /// <summary>
-                ///     Represents the packet received when an ally sends a ping.
+                /// Represents the packet received when an ally sends a ping.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     <c>true</c> if the ping is silent, meaning that the ping produces no sound.
+                    /// <c>true</c> if the ping is silent, meaning that the ping produces no sound.
                     /// </summary>
                     public bool Silent;
 
                     /// <summary>
-                    ///     The source network identifier
+                    /// The source network identifier
                     /// </summary>
                     public int SourceNetworkId;
 
                     /// <summary>
-                    ///     The target network identifier
+                    /// The target network identifier
                     /// </summary>
                     public int TargetNetworkId;
 
                     /// <summary>
-                    ///     The ping type
+                    /// The ping type
                     /// </summary>
                     public PingType Type;
 
                     /// <summary>
-                    ///     The x position
+                    /// The x position
                     /// </summary>
                     public float X;
 
                     /// <summary>
-                    ///     The y position
+                    /// The y position
                     /// </summary>
                     public float Y;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="x">The x.</param>
                     /// <param name="y">The y.</param>
@@ -2022,17 +2019,17 @@ namespace LeagueSharp.Common
             #region GainVision - 4.21
 
             /// <summary>
-            ///     Gets received when a unit enters FOW.
+            /// Gets received when a unit enters FOW.
             /// </summary>
             public static class GainVision
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xFC;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -2047,7 +2044,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -2060,17 +2057,17 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when the team gains vision of a unit.
+                /// Represents the packet received when the team gains vision of a unit.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The unit network identifier
+                    /// The unit network identifier
                     /// </summary>
                     public int UnitNetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="unitNetworkId">The unit network identifier.</param>
                     public Struct(int unitNetworkId = 0)
@@ -2085,18 +2082,18 @@ namespace LeagueSharp.Common
             #region LoseVision - 4.21
 
             /// <summary>
-            ///     Gets received when a unit leaves FOW.
+            /// Gets received when a unit leaves FOW.
             /// </summary>
             public static class LoseVision
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xCD;
 
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -2109,28 +2106,28 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(byte[] data)
                 {
-                    var packet = new GamePacket(data) {Position = 2};
+                    var packet = new GamePacket(data) { Position = 2 };
                     return new Struct(packet.ReadInteger());
                 }
 
                 /// <summary>
-                ///     Represents the packet received when the team loses vision of an unit.
+                /// Represents the packet received when the team loses vision of an unit.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The unit network identifier
+                    /// The unit network identifier
                     /// </summary>
                     public int UnitNetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="unitNetworkId">The unit network identifier.</param>
                     public Struct(int unitNetworkId = 0)
@@ -2143,19 +2140,18 @@ namespace LeagueSharp.Common
             #endregion
 
             #region EmptyJungleCamp - 4.21 partially
-
             /// <summary>
-            ///     Gets received when gaining vision of an empty jungle camp. Partially implemented.
+            /// Gets received when gaining vision of an empty jungle camp. Partially implemented.
             /// </summary>
             public static class EmptyJungleCamp
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x93;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -2173,7 +2169,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -2189,27 +2185,27 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a jungle camp is empty.
+                /// Represents the packet received when a jungle camp is empty.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The camp identifier
+                    /// The camp identifier
                     /// </summary>
                     public int CampId;
 
                     /// <summary>
-                    ///     The empty type
+                    /// The empty type
                     /// </summary>
                     public byte EmptyType;
 
                     /// <summary>
-                    ///     The unit network identifier
+                    /// The unit network identifier
                     /// </summary>
                     public int UnitNetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="unitNetworkId">The unit network identifier.</param>
                     /// <param name="campId">The camp identifier.</param>
@@ -2228,17 +2224,17 @@ namespace LeagueSharp.Common
             #region CastAns
 
             /// <summary>
-            ///     Received when a unit casts a spell.
+            /// Received when a unit casts a spell.
             /// </summary>
             public static class CastAns
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xB5;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -2249,7 +2245,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -2259,7 +2255,7 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.SourceNetworkId = packet.ReadInteger(1);
-                    result.SourceUnit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.SourceNetworkId);
+                    result.SourceUnit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.SourceNetworkId);
 
 
                     result.SpellFlag = packet.ReadShort(10);
@@ -2282,7 +2278,7 @@ namespace LeagueSharp.Common
                     if (c > 0) //hopefully c is 1 always
                     {
                         result.TargetNetworkId = packet.ReadInteger();
-                        result.TargetUnit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.TargetNetworkId);
+                        result.TargetUnit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.TargetNetworkId);
                         packet.ReadByte(); // for 0
                     }
                     result.ChannelTime = packet.ReadFloat();
@@ -2294,7 +2290,7 @@ namespace LeagueSharp.Common
                     packet.ReadInteger();
                     packet.ReadByte();
 
-                    result.SpellSlot = (SpellSlot) packet.ReadByte();
+                    result.SpellSlot = (SpellSlot)packet.ReadByte();
                     result.SpellFlag2 = packet.ReadByte();
                     result.ManaCost = packet.ReadFloat();
 
@@ -2305,107 +2301,107 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a spell is casted.
+                /// Represents the packet received when a spell is casted.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The channel time
+                    /// The channel time
                     /// </summary>
                     public float ChannelTime;
 
                     /// <summary>
-                    ///     The cooldown. Maybe 0.
+                    /// The cooldown. Maybe 0.
                     /// </summary>
                     public float Cooldown; // sometimes 0
 
                     /// <summary>
-                    ///     The delay
+                    /// The delay
                     /// </summary>
                     public float Delay;
 
                     /// <summary>
-                    ///     From position
+                    /// From position
                     /// </summary>
                     public Vector2 FromPosition;
 
                     /// <summary>
-                    ///     <c>true</c> if the spell cast is visible
+                    /// <c>true</c> if the spell cast is visible
                     /// </summary>
                     public bool IsVisible;
 
                     /// <summary>
-                    ///     The mana cost
+                    /// The mana cost
                     /// </summary>
                     public float ManaCost;
 
                     /// <summary>
-                    ///     The missile hash
+                    /// The missile hash
                     /// </summary>
                     public int MissileHash;
 
                     /// <summary>
-                    ///     The missile network identifier
+                    /// The missile network identifier
                     /// </summary>
                     public int MissileNetworkId;
 
                     /// <summary>
-                    ///     The source network identifier
+                    /// The source network identifier
                     /// </summary>
                     public int SourceNetworkId;
 
                     /// <summary>
-                    ///     The source unit
+                    /// The source unit
                     /// </summary>
                     public Obj_AI_Base SourceUnit;
 
                     /// <summary>
-                    ///     The speed
+                    /// The speed
                     /// </summary>
                     public float Speed;
 
                     /// <summary>
-                    ///     The spell flag
+                    /// The spell flag
                     /// </summary>
                     public short SpellFlag;
 
                     /// <summary>
-                    ///     The spell flag2
+                    /// The spell flag2
                     /// </summary>
                     public byte SpellFlag2;
 
                     /// <summary>
-                    ///     The spell hash
+                    /// The spell hash
                     /// </summary>
                     public int SpellHash;
 
                     /// <summary>
-                    ///     The spell network identifier
+                    /// The spell network identifier
                     /// </summary>
                     public int SpellNetworkId;
 
                     /// <summary>
-                    ///     The spell slot
+                    /// The spell slot
                     /// </summary>
                     public SpellSlot SpellSlot;
 
                     /// <summary>
-                    ///     The target network identifier
+                    /// The target network identifier
                     /// </summary>
                     public int TargetNetworkId;
 
                     /// <summary>
-                    ///     The target unit
+                    /// The target unit
                     /// </summary>
                     public Obj_AI_Base TargetUnit;
 
                     /// <summary>
-                    ///     To position
+                    /// To position
                     /// </summary>
                     public Vector2 ToPosition;
 
                     /// <summary>
-                    ///     If this value is greater than 0, the spell cast is visible.
+                    /// If this value is greater than 0, the spell cast is visible.
                     /// </summary>
                     public float Visible; // >0 visible
                 }
@@ -2416,17 +2412,17 @@ namespace LeagueSharp.Common
             #region Dash - 4.12 only header updated
 
             /// <summary>
-            ///     Gets received when a unit dashes.
+            /// Gets received when a unit dashes.
             /// </summary>
             public static class Dash
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xD7;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -2437,7 +2433,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -2447,28 +2443,27 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.UnitNetworkId = packet.ReadInteger(12);
-                    result.Speed = 900; //packet.ReadFloat();
+                    result.Speed = 900;//packet.ReadFloat();
 
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit dashes.
+                /// Represents the packet received when a unit dashes.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The speed
+                    /// The speed
                     /// </summary>
                     public float Speed;
-
                     /// <summary>
-                    ///     The unit network identifier
+                    /// The unit network identifier
                     /// </summary>
                     public int UnitNetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="unitNetworkId">The unit network identifier.</param>
                     /// <param name="speed">The speed.</param>
@@ -2485,17 +2480,17 @@ namespace LeagueSharp.Common
             #region GameEnd - 4.21
 
             /// <summary>
-            ///     Gets received when the game ends.
+            /// Gets received when the game ends.
             /// </summary>
             public static class GameEnd
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xED;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -2508,7 +2503,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -2522,17 +2517,17 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when the game ends.
+                /// Represents the packet received when the game ends.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The winner
+                    /// The winner
                     /// </summary>
                     public byte Winner;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="winner">The winner.</param>
                     public Struct(byte winner = 1)
@@ -2547,22 +2542,22 @@ namespace LeagueSharp.Common
             #region TowerAggro
 
             /// <summary>
-            ///     Gets received when a tower starts targeting a unit
+            /// Gets received when a tower starts targeting a unit
             /// </summary>
             public static class TowerAggro
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x6A;
 
                 /// <summary>
-                ///     The aggro list
+                /// The aggro list
                 /// </summary>
                 public static readonly Dictionary<int, int> AggroList = new Dictionary<int, int>();
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -2575,7 +2570,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -2596,22 +2591,22 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a tower focuses a target.
+                /// Represents the packet received when a tower focuses a target.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The target network identifier
+                    /// The target network identifier
                     /// </summary>
                     public int TargetNetworkId;
 
                     /// <summary>
-                    ///     The turret network identifier
+                    /// The turret network identifier
                     /// </summary>
                     public int TurretNetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="turretNetworkId">The turret network identifier.</param>
                     /// <param name="targetNetworkId">The target network identifier.</param>
@@ -2628,17 +2623,17 @@ namespace LeagueSharp.Common
             #region UpdateModel
 
             /// <summary>
-            ///     Gets received when the model changes.
+            /// Gets received when the model changes.
             /// </summary>
             public static class UpdateModel
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x1A;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -2648,13 +2643,13 @@ namespace LeagueSharp.Common
                     result.WriteByte(0);
                     result.WriteInteger(packetStruct.NetworkId);
                     result.WriteInteger(packetStruct.NetworkId & ~0x40000000);
-                    result.WriteByte((byte) (packetStruct.BOk ? 1 : 0));
+                    result.WriteByte((byte)(packetStruct.BOk ? 1 : 0));
                     result.WriteInteger(packetStruct.SkinId);
                     for (var i = 0; i < 32; i++)
                     {
                         if (i < packetStruct.ModelName.Length)
                         {
-                            result.WriteByte((byte) packetStruct.ModelName[i]);
+                            result.WriteByte((byte)packetStruct.ModelName[i]);
                         }
                         else
                         {
@@ -2666,7 +2661,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -2684,37 +2679,37 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when the model of a unit is updated.
+                /// Represents the packet received when the model of a unit is updated.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The b ok
+                    /// The b ok
                     /// </summary>
                     public bool BOk;
 
                     /// <summary>
-                    ///     The identifier
+                    /// The identifier
                     /// </summary>
                     public int Id;
 
                     /// <summary>
-                    ///     The model name
+                    /// The model name
                     /// </summary>
                     public string ModelName;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The skin identifier
+                    /// The skin identifier
                     /// </summary>
                     public int SkinId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="networkId">The network identifier.</param>
                     /// <param name="skinId">The skin identifier.</param>
@@ -2737,98 +2732,217 @@ namespace LeagueSharp.Common
             #region Teleport - 4.21
 
             /// <summary>
-            ///     Gets received when a unit starts, aborts or finishes a teleport (such as recall, teleport, twisted fate ulti, shen
-            ///     ulti,...)
+            /// Gets received when a unit starts, aborts or finishes a teleport (such as recall, teleport, twisted fate ulti, shen
+            /// ulti,...)
             /// </summary>
             public static class Teleport
             {
                 /// <summary>
-                ///     The status of the teleport.
+                /// The status of the teleport.
                 /// </summary>
                 public enum Status
                 {
                     /// <summary>
-                    ///     The teleport has been started.
+                    /// The teleport has been started.
                     /// </summary>
                     Start,
 
                     /// <summary>
-                    ///     The teleport has been aborted.
+                    /// The teleport has been aborted.
                     /// </summary>
                     Abort,
 
                     /// <summary>
-                    ///     The teleport has finished.
+                    /// The teleport has finished.
                     /// </summary>
                     Finish,
 
                     /// <summary>
-                    ///     The status of the teleport is unknown.
+                    /// The status of the teleport is unknown.
                     /// </summary>
                     Unknown
                 }
 
                 /// <summary>
-                ///     The type of teleport.
+                /// The type of teleport.
                 /// </summary>
                 public enum Type
                 {
                     /// <summary>
-                    ///     The unit is recalling back to base.
+                    /// The unit is recalling back to base.
                     /// </summary>
                     Recall,
 
                     /// <summary>
-                    ///     The unit is teleporting to another unit with the Teleport summoner spell.
+                    /// The unit is teleporting to another unit with the Teleport summoner spell.
                     /// </summary>
                     Teleport,
 
                     /// <summary>
-                    ///     The unit is teleporting to a location with Twisted Fate's Ultimate.
+                    /// The unit is teleporting to a location with Twisted Fate's Ultimate.
                     /// </summary>
                     TwistedFate,
 
                     /// <summary>
-                    ///     The unit is teleporting to a unit with Shen's Ultimate.
+                    /// The unit is teleporting to a unit with Shen's Ultimate.
                     /// </summary>
                     Shen,
 
                     /// <summary>
-                    ///     The type of teleportation is unknown.
+                    /// The type of teleportation is unknown.
                     /// </summary>
                     Unknown
                 }
 
                 /// <summary>
-                ///     The error gap in ticks.
+                /// An interface for different types of teleports to get durations and type of teleport. 
                 /// </summary>
-                private const int ErrorGap = 100; //in ticks
+                internal interface ITeleport
+                {
+                    /// <summary>
+                    /// Gets the type.
+                    /// </summary>
+                    /// <value>The type.</value>
+                    Type Type { get; }
+
+                    /// <summary>
+                    /// Gets the duration.
+                    /// </summary>
+                    /// <param name="packetData">The <see cref="GameObjectTeleportEventArgs"/> instance containing the event data.</param>
+                    /// <returns>System.Int32.</returns>
+                    int GetDuration(GameObjectTeleportEventArgs packetData);
+                }
+
+                /// <summary>
+                /// A recall teleport.
+                /// </summary>
+                internal class RecallTeleport : ITeleport
+                {
+                    /// <summary>
+                    /// Gets the type.
+                    /// </summary>
+                    /// <value>The type.</value>
+                    public Type Type
+                    {
+                        get { return Type.Recall; }
+                    }
+
+                    /// <summary>
+                    /// Gets the duration.
+                    /// </summary>
+                    /// <param name="args">The <see cref="GameObjectTeleportEventArgs"/> instance containing the event data.</param>
+                    /// <returns>System.Int32.</returns>
+                    public int GetDuration(GameObjectTeleportEventArgs args)
+                    {
+                        return Utility.GetRecallTime(args.RecallName);
+                    }
+                }
+
+                /// <summary>
+                /// A teleport summoner spell teleport.
+                /// </summary>
+                internal class TeleportTeleport : ITeleport
+                {
+                    /// <summary>
+                    /// Gets the type.
+                    /// </summary>
+                    /// <value>The type.</value>
+                    public Type Type
+                    {
+                        get { return Type.Teleport; }
+                    }
+
+                    /// <summary>
+                    /// Gets the duration.
+                    /// </summary>
+                    /// <param name="args">The <see cref="GameObjectTeleportEventArgs"/> instance containing the event data.</param>
+                    /// <returns>System.Int32.</returns>
+                    public int GetDuration(GameObjectTeleportEventArgs args)
+                    {
+                        return 3500;
+                    }
+                }
+
+                /// <summary>
+                /// A Twisted Fate's Ultimate Teleport.
+                /// </summary>
+                internal class TwistedFateTeleport : ITeleport
+                {
+                    /// <summary>
+                    /// Gets the type.
+                    /// </summary>
+                    /// <value>The type.</value>
+                    public Type Type
+                    {
+                        get { return Type.TwistedFate; }
+                    }
+
+                    /// <summary>
+                    /// Gets the duration.
+                    /// </summary>
+                    /// <param name="args">The <see cref="GameObjectTeleportEventArgs"/> instance containing the event data.</param>
+                    /// <returns>System.Int32.</returns>
+                    public int GetDuration(GameObjectTeleportEventArgs args)
+                    {
+                        return 1500;
+                    }
+                }
+
+                /// <summary>
+                /// A Shen's Ultimate teleport.
+                /// </summary>
+                internal class ShenTeleport : ITeleport
+                {
+                    /// <summary>
+                    /// Gets the type.
+                    /// </summary>
+                    /// <value>The type.</value>
+                    public Type Type
+                    {
+                        get { return Type.Shen; }
+                    }
+
+                    /// <summary>
+                    /// Gets the duration.
+                    /// </summary>
+                    /// <param name="args">The <see cref="GameObjectTeleportEventArgs"/> instance containing the event data.</param>
+                    /// <returns>System.Int32.</returns>
+                    public int GetDuration(GameObjectTeleportEventArgs args)
+                    {
+                        return 3000;
+                    }
+                }
 
 
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x44;
 
                 /// <summary>
-                ///     The type by string
+                /// The error gap in ticks.
+                /// </summary>
+                private const int ErrorGap = 100; //in ticks
+
+                /// <summary>
+                /// The type by string
                 /// </summary>
                 private static readonly IDictionary<string, ITeleport> TypeByString = new Dictionary<string, ITeleport>
                 {
                     {"Recall", new RecallTeleport()},
                     {"Teleport", new TeleportTeleport()},
                     {"Gate", new TwistedFateTeleport()},
-                    {"Shen", new ShenTeleport()}
+                    {"Shen", new ShenTeleport()},
                 };
 
                 /// <summary>
-                ///     The recall data by network identifier
+                /// The recall data by network identifier
                 /// </summary>
                 private static readonly IDictionary<int, TeleportData> RecallDataByNetworkId =
                     new Dictionary<int, TeleportData>();
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -2839,10 +2953,10 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified sender.
+                /// Decodes the specified sender.
                 /// </summary>
                 /// <param name="sender">The sender.</param>
-                /// <param name="args">The <see cref="GameObjectTeleportEventArgs" /> instance containing the event data.</param>
+                /// <param name="args">The <see cref="GameObjectTeleportEventArgs"/> instance containing the event data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(GameObject sender, GameObjectTeleportEventArgs args) //
                 {
@@ -2859,20 +2973,22 @@ namespace LeagueSharp.Common
 
                     result.UnitNetworkId = sender.NetworkId;
 
+                    var hero = sender as AIHeroClient;
+
                     if (!RecallDataByNetworkId.ContainsKey(result.UnitNetworkId))
                     {
-                        RecallDataByNetworkId[result.UnitNetworkId] = new TeleportData {Type = Type.Unknown};
+                        RecallDataByNetworkId[result.UnitNetworkId] = new TeleportData { Type = Type.Unknown };
                     }
 
                     if (!string.IsNullOrEmpty(args.RecallType))
                     {
                         if (TypeByString.ContainsKey(args.RecallType))
                         {
-                            var teleportMethod = TypeByString[args.RecallType];
+                            ITeleport teleportMethod = TypeByString[args.RecallType];
 
-                            var duration = teleportMethod.GetDuration(args);
-                            var type = teleportMethod.Type;
-                            var time = Utils.TickCount;
+                            int duration = teleportMethod.GetDuration(args);
+                            Type type = teleportMethod.Type;
+                            int time = Utils.TickCount;
 
                             RecallDataByNetworkId[result.UnitNetworkId] = new TeleportData
                             {
@@ -2889,8 +3005,8 @@ namespace LeagueSharp.Common
                     }
                     else
                     {
-                        var shorter = Utils.TickCount - RecallDataByNetworkId[result.UnitNetworkId].Start <
-                                      RecallDataByNetworkId[result.UnitNetworkId].Duration - ErrorGap;
+                        bool shorter = Utils.TickCount - RecallDataByNetworkId[result.UnitNetworkId].Start <
+                                       RecallDataByNetworkId[result.UnitNetworkId].Duration - ErrorGap;
                         result.Status = shorter ? Status.Abort : Status.Finish;
                         result.Type = RecallDataByNetworkId[result.UnitNetworkId].Type;
                         result.Duration = 0;
@@ -2900,180 +3016,62 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     An interface for different types of teleports to get durations and type of teleport.
-                /// </summary>
-                internal interface ITeleport
-                {
-                    /// <summary>
-                    ///     Gets the type.
-                    /// </summary>
-                    /// <value>The type.</value>
-                    Type Type { get; }
-
-                    /// <summary>
-                    ///     Gets the duration.
-                    /// </summary>
-                    /// <param name="packetData">The <see cref="GameObjectTeleportEventArgs" /> instance containing the event data.</param>
-                    /// <returns>System.Int32.</returns>
-                    int GetDuration(GameObjectTeleportEventArgs packetData);
-                }
-
-                /// <summary>
-                ///     A recall teleport.
-                /// </summary>
-                internal class RecallTeleport : ITeleport
-                {
-                    /// <summary>
-                    ///     Gets the type.
-                    /// </summary>
-                    /// <value>The type.</value>
-                    public Type Type
-                    {
-                        get { return Type.Recall; }
-                    }
-
-                    /// <summary>
-                    ///     Gets the duration.
-                    /// </summary>
-                    /// <param name="args">The <see cref="GameObjectTeleportEventArgs" /> instance containing the event data.</param>
-                    /// <returns>System.Int32.</returns>
-                    public int GetDuration(GameObjectTeleportEventArgs args)
-                    {
-                        return Utility.GetRecallTime(args.RecallName);
-                    }
-                }
-
-                /// <summary>
-                ///     A teleport summoner spell teleport.
-                /// </summary>
-                internal class TeleportTeleport : ITeleport
-                {
-                    /// <summary>
-                    ///     Gets the type.
-                    /// </summary>
-                    /// <value>The type.</value>
-                    public Type Type
-                    {
-                        get { return Type.Teleport; }
-                    }
-
-                    /// <summary>
-                    ///     Gets the duration.
-                    /// </summary>
-                    /// <param name="args">The <see cref="GameObjectTeleportEventArgs" /> instance containing the event data.</param>
-                    /// <returns>System.Int32.</returns>
-                    public int GetDuration(GameObjectTeleportEventArgs args)
-                    {
-                        return 3500;
-                    }
-                }
-
-                /// <summary>
-                ///     A Twisted Fate's Ultimate Teleport.
-                /// </summary>
-                internal class TwistedFateTeleport : ITeleport
-                {
-                    /// <summary>
-                    ///     Gets the type.
-                    /// </summary>
-                    /// <value>The type.</value>
-                    public Type Type
-                    {
-                        get { return Type.TwistedFate; }
-                    }
-
-                    /// <summary>
-                    ///     Gets the duration.
-                    /// </summary>
-                    /// <param name="args">The <see cref="GameObjectTeleportEventArgs" /> instance containing the event data.</param>
-                    /// <returns>System.Int32.</returns>
-                    public int GetDuration(GameObjectTeleportEventArgs args)
-                    {
-                        return 1500;
-                    }
-                }
-
-                /// <summary>
-                ///     A Shen's Ultimate teleport.
-                /// </summary>
-                internal class ShenTeleport : ITeleport
-                {
-                    /// <summary>
-                    ///     Gets the type.
-                    /// </summary>
-                    /// <value>The type.</value>
-                    public Type Type
-                    {
-                        get { return Type.Shen; }
-                    }
-
-                    /// <summary>
-                    ///     Gets the duration.
-                    /// </summary>
-                    /// <param name="args">The <see cref="GameObjectTeleportEventArgs" /> instance containing the event data.</param>
-                    /// <returns>System.Int32.</returns>
-                    public int GetDuration(GameObjectTeleportEventArgs args)
-                    {
-                        return 3000;
-                    }
-                }
-
-                /// <summary>
-                ///     Contains data about the teleport.
+                /// Contains data about the teleport.
                 /// </summary>
                 internal struct TeleportData
                 {
                     /// <summary>
-                    ///     Gets or sets the type.
+                    /// Gets or sets the type.
                     /// </summary>
                     /// <value>The type.</value>
                     public Type Type { get; set; }
 
                     /// <summary>
-                    ///     Gets or sets the start.
+                    /// Gets or sets the start.
                     /// </summary>
                     /// <value>The start.</value>
                     public int Start { get; set; }
 
                     /// <summary>
-                    ///     Gets or sets the duration.
+                    /// Gets or sets the duration.
                     /// </summary>
                     /// <value>The duration.</value>
                     public int Duration { get; set; }
+
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit teleports.
+                /// Represents the packet received when a unit teleports.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The duration
+                    /// The duration
                     /// </summary>
                     public int Duration;
 
                     /// <summary>
-                    ///     The status
+                    /// The status
                     /// </summary>
                     public Status Status;
 
                     /// <summary>
-                    ///     The type
+                    /// The type
                     /// </summary>
                     public Type Type;
 
                     /// <summary>
-                    ///     The start
+                    /// The start
                     /// </summary>
                     public int Start;
 
                     /// <summary>
-                    ///     The unit network identifier
+                    /// The unit network identifier
                     /// </summary>
                     public int UnitNetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="unitNetworkId">The unit network identifier.</param>
                     /// <param name="status">The status.</param>
@@ -3096,17 +3094,17 @@ namespace LeagueSharp.Common
             #region PlayEmote - 4.21
 
             /// <summary>
-            ///     Gets received when an unit uses an emote.
+            /// Gets received when an unit uses an emote.
             /// </summary>
             public static class PlayEmote
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xAA;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -3120,7 +3118,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3134,22 +3132,22 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit uses an emote.
+                /// Represents the packet received when a unit uses an emote.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The emote identifier
+                    /// The emote identifier
                     /// </summary>
                     public byte EmoteId;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="emoteId">The emote identifier.</param>
                     /// <param name="networkId">The network identifier.</param>
@@ -3166,17 +3164,17 @@ namespace LeagueSharp.Common
             #region Damage - 4.21 partially
 
             /// <summary>
-            ///     Packet received when a unit deals damage.
+            /// Packet received when a unit deals damage.
             /// </summary>
             public class Damage
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x23;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -3186,7 +3184,7 @@ namespace LeagueSharp.Common
                     var packet = new GamePacket(Header);
                     packet.WriteByte(0);
                     packet.WriteInteger(packetStruct.TargetNetworkId);
-                    packet.WriteByte((byte) packetStruct.Type);
+                    packet.WriteByte((byte)packetStruct.Type);
                     packet.WriteShort(packetStruct.Unknown); // Unknown value
                     packet.WriteFloat(packetStruct.DamageAmount);
                     packet.WriteInteger(packetStruct.TargetNetworkIdCopy);
@@ -3197,7 +3195,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3211,49 +3209,49 @@ namespace LeagueSharp.Common
                     result.TargetNetworkIdCopy = packet.ReadInteger();
                     result.SourceNetworkId = packet.ReadInteger();
                     //wrong:
-                    result.Type = (DamageTypePacket) packet.ReadByte();
+                    result.Type = (DamageTypePacket)packet.ReadByte();
                     result.Unknown = packet.ReadShort();
                     result.DamageAmount = packet.ReadFloat();
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet received when unit deals damage.
+                /// Represents the packet received when unit deals damage.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The damage amount
+                    /// The damage amount
                     /// </summary>
                     public float DamageAmount;
 
                     /// <summary>
-                    ///     The source network identifier
+                    /// The source network identifier
                     /// </summary>
                     public int SourceNetworkId;
 
                     /// <summary>
-                    ///     The target network identifier
+                    /// The target network identifier
                     /// </summary>
                     public int TargetNetworkId;
 
                     /// <summary>
-                    ///     The target network identifier copy
+                    /// The target network identifier copy
                     /// </summary>
                     public int TargetNetworkIdCopy;
 
                     /// <summary>
-                    ///     The type
+                    /// The type
                     /// </summary>
                     public DamageTypePacket Type;
 
                     /// <summary>
-                    ///     Unknown short value.
+                    /// Unknown short value.
                     /// </summary>
                     public short Unknown;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="damageAmount">The damage amount.</param>
                     /// <param name="sourceNetworkId">The source network identifier.</param>
@@ -3283,17 +3281,17 @@ namespace LeagueSharp.Common
             #region FloatText
 
             /// <summary>
-            ///     Packet received to print floating text.
+            /// Packet received to print floating text.
             /// </summary>
             public class FloatText
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x19;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -3303,7 +3301,7 @@ namespace LeagueSharp.Common
 
                     packet.WriteInteger(0);
                     packet.WriteInteger(packetStruct.NetworkId);
-                    packet.WriteByte((byte) packetStruct.Type);
+                    packet.WriteByte((byte)packetStruct.Type);
                     packet.WriteInteger(packetStruct.NetworkId);
                     packet.WriteString(packetStruct.Text);
                     packet.WriteByte(0);
@@ -3312,7 +3310,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3322,7 +3320,7 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.NetworkId = packet.ReadInteger(1);
-                    result.Type = (FloatTextPacket) packet.ReadByte();
+                    result.Type = (FloatTextPacket)packet.ReadByte();
                     //result.Text = packet.ReadString();
 
                     return result;
@@ -3330,27 +3328,27 @@ namespace LeagueSharp.Common
 
 
                 /// <summary>
-                ///     Represents the packet received when text is to be placed on a unit.
+                /// Represents the packet received when text is to be placed on a unit.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The text
+                    /// The text
                     /// </summary>
                     public string Text;
 
                     /// <summary>
-                    ///     The type
+                    /// The type
                     /// </summary>
                     public FloatTextPacket Type;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="text">The text.</param>
                     /// <param name="type">The type.</param>
@@ -3369,21 +3367,21 @@ namespace LeagueSharp.Common
             #region DebugMessage
 
             /// <summary>
-            ///     Packet received for a debug message.
+            /// Packet received for a debug message.
             /// </summary>
             public class DebugMessage
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xF7;
 
                 /// <summary>
-                ///     Encodes the specified debug string.
+                /// Encodes the specified debug string.
                 /// </summary>
                 /// <param name="debugString">The debug string.</param>
                 /// <returns>GamePacket.</returns>
-                public static GamePacket Encoded(string debugString)
+                public static GamePacket Encoded(String debugString)
                 {
                     var packet = new GamePacket(Header);
 
@@ -3399,17 +3397,17 @@ namespace LeagueSharp.Common
             #region HighlightUnit
 
             /// <summary>
-            ///     Packet received to highlight a unit.
+            /// Packet received to highlight a unit.
             /// </summary>
             public class HighlightUnit
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x59;
 
                 /// <summary>
-                ///     Encodes the specified network identifier.
+                /// Encodes the specified network identifier.
                 /// </summary>
                 /// <param name="networkId">The network identifier.</param>
                 /// <returns>GamePacket.</returns>
@@ -3429,17 +3427,17 @@ namespace LeagueSharp.Common
             #region RemoveHighlightUnit
 
             /// <summary>
-            ///     Packet received to remove a unit's highlight.
+            /// Packet received to remove a unit's highlight.
             /// </summary>
             public class RemoveHighlightUnit
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xB4;
 
                 /// <summary>
-                ///     Encodes the specified network identifier.
+                /// Encodes the specified network identifier.
                 /// </summary>
                 /// <param name="networkId">The network identifier.</param>
                 /// <returns>GamePacket.</returns>
@@ -3459,17 +3457,17 @@ namespace LeagueSharp.Common
             #region PlayerDisconnect - 4.21
 
             /// <summary>
-            ///     Packet received on player disconnect.
+            /// Packet received on player disconnect.
             /// </summary>
             public class PlayerDisconnect
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xFE;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3481,23 +3479,23 @@ namespace LeagueSharp.Common
 
                     packet.Position = 6;
                     result.NetworkId = packet.ReadInteger();
-                    result.Player = ObjectManager.GetUnitByNetworkId<AIHeroClient>((uint) result.NetworkId);
+                    result.Player = ObjectManager.GetUnitByNetworkId<AIHeroClient>((uint)result.NetworkId);
 
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a player disconnects from the game.
+                /// Represents the packet received when a player disconnects from the game.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The player
+                    /// The player
                     /// </summary>
                     public AIHeroClient Player;
                 }
@@ -3508,17 +3506,17 @@ namespace LeagueSharp.Common
             #region PlayerReconnect
 
             /// <summary>
-            ///     Packet received when a player presses the "Reconnect" Button.
+            /// Packet received when a player presses the "Reconnect" Button.
             /// </summary>
             public class PlayerReconnect
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x0;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3536,17 +3534,17 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a player reconects to the game.
+                /// Represents the packet received when a player reconects to the game.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The client identifier
+                    /// The client identifier
                     /// </summary>
                     public int ClientId;
 
                     /// <summary>
-                    ///     The player
+                    /// The player
                     /// </summary>
                     public AIHeroClient Player;
                 }
@@ -3557,17 +3555,17 @@ namespace LeagueSharp.Common
             #region PlayerReconnected
 
             /// <summary>
-            ///     Packet received when a player reconnected.
+            /// Packet received when a player reconnected.
             /// </summary>
             public class PlayerReconnected
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xF;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3585,17 +3583,17 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a player reconnectes to the game.
+                /// Represents the packet received when a player reconnectes to the game.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The client identifier
+                    /// The client identifier
                     /// </summary>
                     public int ClientId;
 
                     /// <summary>
-                    ///     The player
+                    /// The player
                     /// </summary>
                     public AIHeroClient Player;
                 }
@@ -3606,17 +3604,17 @@ namespace LeagueSharp.Common
             #region GainBuff
 
             /// <summary>
-            ///     Packet received on gaining buff.
+            /// Packet received on gaining buff.
             /// </summary>
             public class GainBuff
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xB7;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3626,89 +3624,89 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.NetworkId = packet.ReadInteger(1);
-                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.NetworkId);
+                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.NetworkId);
 
                     result.BuffSlot = packet.ReadByte();
-                    result.Type = (BuffType) packet.ReadByte();
+                    result.Type = (BuffType)packet.ReadByte();
                     result.Stack = packet.ReadByte();
                     result.Visible = packet.ReadByte() > 0;
                     result.BuffId = packet.ReadInteger();
 
                     result.TargetNetworkId = packet.ReadInteger();
-                    result.Target = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.TargetNetworkId);
+                    result.Target = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.TargetNetworkId);
 
                     packet.Position += 4;
 
                     result.Duration = packet.ReadFloat();
 
                     result.SourceNetworkId = packet.ReadInteger();
-                    result.Source = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.SourceNetworkId);
+                    result.Source = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.SourceNetworkId);
 
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit gains a buff.
+                /// Represents the packet received when a unit gains a buff.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The buff identifier
+                    /// The buff identifier
                     /// </summary>
                     public int BuffId;
 
                     /// <summary>
-                    ///     The buff slot
+                    /// The buff slot
                     /// </summary>
                     public byte BuffSlot;
 
                     /// <summary>
-                    ///     The duration of the buff
+                    /// The duration of the buff
                     /// </summary>
                     public float Duration;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The source
+                    /// The source
                     /// </summary>
                     public Obj_AI_Base Source;
 
                     /// <summary>
-                    ///     The source network identifier
+                    /// The source network identifier
                     /// </summary>
                     public int SourceNetworkId;
 
                     /// <summary>
-                    ///     The buff stacks
+                    /// The buff stacks
                     /// </summary>
                     public int Stack;
 
                     /// <summary>
-                    ///     The target
+                    /// The target
                     /// </summary>
                     public Obj_AI_Base Target;
 
                     /// <summary>
-                    ///     The target network identifier
+                    /// The target network identifier
                     /// </summary>
                     public int TargetNetworkId;
 
                     /// <summary>
-                    ///     The buff type
+                    /// The buff type
                     /// </summary>
                     public BuffType Type;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public Obj_AI_Base Unit;
 
                     /// <summary>
-                    ///     <c>true</c> if the buff is visible.
+                    /// <c>true</c> if the buff is visible.
                     /// </summary>
                     public bool Visible;
                 }
@@ -3719,17 +3717,17 @@ namespace LeagueSharp.Common
             #region LoseBuff
 
             /// <summary>
-            ///     Packet received on losing buff.
+            /// Packet received on losing buff.
             /// </summary>
             public class LoseBuff
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x7B;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3739,7 +3737,7 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.NetworkId = packet.ReadInteger(1);
-                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.NetworkId);
+                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.NetworkId);
 
                     result.BuffSlot = packet.ReadByte();
                     result.BuffId = packet.ReadInteger();
@@ -3749,32 +3747,32 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit loses a buff.
+                /// Represents the packet received when a unit loses a buff.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The buff identifier
+                    /// The buff identifier
                     /// </summary>
                     public int BuffId;
 
                     /// <summary>
-                    ///     The buff slot
+                    /// The buff slot
                     /// </summary>
                     public byte BuffSlot;
 
                     /// <summary>
-                    ///     The duration of the buff
+                    /// The duration of the buff
                     /// </summary>
                     public float Duration;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public Obj_AI_Base Unit;
                 }
@@ -3785,17 +3783,17 @@ namespace LeagueSharp.Common
             #region SetCooldown
 
             /// <summary>
-            ///     A packet that sets cooldown of a spell/item.
+            /// A packet that sets cooldown of a spell/item.
             /// </summary>
             public class SetCooldown
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x85;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3805,8 +3803,8 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.NetworkId = packet.ReadInteger(1);
-                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.NetworkId);
-                    result.Slot = (SpellSlot) packet.ReadByte();
+                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.NetworkId);
+                    result.Slot = (SpellSlot)packet.ReadByte();
                     packet.Position += 1;
                     result.TotalCooldown = packet.ReadFloat();
                     result.CurrentCooldown = packet.ReadFloat();
@@ -3815,7 +3813,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="packetStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -3823,7 +3821,7 @@ namespace LeagueSharp.Common
                 {
                     var packet = new GamePacket(Header);
                     packet.WriteInteger(packetStruct.NetworkId);
-                    packet.WriteByte((byte) packetStruct.Slot);
+                    packet.WriteByte((byte)packetStruct.Slot);
                     packet.WriteByte(0xF8);
                     packet.WriteFloat(packetStruct.TotalCooldown);
                     packet.WriteFloat(packetStruct.CurrentCooldown);
@@ -3832,37 +3830,37 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received to set the cooldown of a spell/item.
+                /// Represents the packet received to set the cooldown of a spell/item.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The current cooldown
+                    /// The current cooldown
                     /// </summary>
                     public float CurrentCooldown;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The slot
+                    /// The slot
                     /// </summary>
                     public SpellSlot Slot;
 
                     /// <summary>
-                    ///     The total cooldown
+                    /// The total cooldown
                     /// </summary>
                     public float TotalCooldown;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public Obj_AI_Base Unit;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="networkId">The network identifier.</param>
                     /// <param name="slot">The slot.</param>
@@ -3871,7 +3869,7 @@ namespace LeagueSharp.Common
                     public Struct(int networkId, SpellSlot slot, float totalCd, float currentCd)
                     {
                         NetworkId = networkId;
-                        Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) NetworkId);
+                        Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)NetworkId);
                         Slot = slot;
                         TotalCooldown = totalCd;
                         CurrentCooldown = currentCd;
@@ -3884,17 +3882,17 @@ namespace LeagueSharp.Common
             #region StartItemCooldown
 
             /// <summary>
-            ///     One packet that starts cooldown (mostly for items).
+            /// One packet that starts cooldown (mostly for items).
             /// </summary>
             public class StartItemCooldown
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x9F;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3904,35 +3902,35 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.NetworkId = packet.ReadInteger(1);
-                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.NetworkId);
+                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.NetworkId);
                     result.InventorySlot = packet.ReadByte();
-                    result.SpellSlot = (SpellSlot) (result.InventorySlot + (byte) SpellSlot.Item1);
+                    result.SpellSlot = (SpellSlot)(result.InventorySlot + (byte)SpellSlot.Item1);
                     return result;
                 }
 
 
                 /// <summary>
-                ///     Represents the packet received to start the cooldown of an item.
+                /// Represents the packet received to start the cooldown of an item.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The inventory slot
+                    /// The inventory slot
                     /// </summary>
                     public byte InventorySlot;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The spell slot
+                    /// The spell slot
                     /// </summary>
                     public SpellSlot SpellSlot;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public Obj_AI_Base Unit;
                 }
@@ -3943,17 +3941,17 @@ namespace LeagueSharp.Common
             #region BuyItemAns
 
             /// <summary>
-            ///     Packet received on buying item.
+            /// Packet received on buying item.
             /// </summary>
             public class BuyItemAns
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x6F;
 
                 /// <summary>
-                ///     Encodes the specified packet structure.
+                /// Encodes the specified packet structure.
                 /// </summary>
                 /// <param name="pStruct">The packet structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -3961,18 +3959,18 @@ namespace LeagueSharp.Common
                 {
                     var packet = new GamePacket(Header);
                     packet.WriteInteger(pStruct.NetworkId);
-                    packet.WriteShort((short) pStruct.Item.Id);
+                    packet.WriteShort((short)pStruct.Item.Id);
                     packet.WriteByte(0, 2);
                     packet.WriteByte(pStruct.InventorySlot);
-                    packet.WriteByte((byte) pStruct.Stack);
-                    packet.WriteByte((byte) pStruct.Charge);
+                    packet.WriteByte((byte)pStruct.Stack);
+                    packet.WriteByte((byte)pStruct.Charge);
                     packet.WriteByte(pStruct.ReplaceItem);
 
                     return packet;
                 }
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -3982,10 +3980,10 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.NetworkId = packet.ReadInteger(1);
-                    result.Item = new Items.Item(packet.ReadShort());
+                    result.Item = new Items.Item(packet.ReadShort(), 0);
                     packet.Position += 2;
                     result.InventorySlot = packet.ReadByte();
-                    result.SpellSlot = (SpellSlot) (result.InventorySlot + (byte) SpellSlot.Item1);
+                    result.SpellSlot = (SpellSlot)(result.InventorySlot + (byte)SpellSlot.Item1);
                     result.Stack = packet.ReadByte();
                     result.Charge = packet.ReadByte();
                     result.ReplaceItem = packet.ReadByte();
@@ -3994,52 +3992,52 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit buys an item.
+                /// Represents the packet received when a unit buys an item.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The charges of the item.
+                    /// The charges of the item.
                     /// </summary>
                     public int Charge;
 
                     /// <summary>
-                    ///     The inventory slot
+                    /// The inventory slot
                     /// </summary>
                     public byte InventorySlot;
 
                     /// <summary>
-                    ///     The item
+                    /// The item
                     /// </summary>
                     public Items.Item Item;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The replace item
+                    /// The replace item
                     /// </summary>
                     public byte ReplaceItem;
 
                     /// <summary>
-                    ///     The spell slot
+                    /// The spell slot
                     /// </summary>
                     public SpellSlot SpellSlot;
 
                     /// <summary>
-                    ///     The stacks of the item.
+                    /// The stacks of the item.
                     /// </summary>
                     public int Stack;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public AIHeroClient Unit;
 
                     /// <summary>
-                    ///     Initializes a new instance of the <see cref="Struct" /> struct.
+                    /// Initializes a new instance of the <see cref="Struct"/> struct.
                     /// </summary>
                     /// <param name="id">The identifier.</param>
                     /// <param name="slot">The slot.</param>
@@ -4054,14 +4052,14 @@ namespace LeagueSharp.Common
                         int charge = 0,
                         int networkId = -1)
                     {
-                        Item = new Items.Item(id);
+                        Item = new Items.Item(id, 0);
                         InventorySlot = slot;
-                        SpellSlot = (SpellSlot) (InventorySlot + (byte) SpellSlot.Item1);
+                        SpellSlot = (SpellSlot)(InventorySlot + (byte)SpellSlot.Item1);
                         ReplaceItem = replace;
                         Stack = stack;
                         Charge = charge;
                         NetworkId = networkId == -1 ? ObjectManager.Player.NetworkId : networkId;
-                        Unit = ObjectManager.GetUnitByNetworkId<AIHeroClient>((uint) NetworkId);
+                        Unit = ObjectManager.GetUnitByNetworkId<AIHeroClient>((uint)NetworkId);
                     }
                 }
             }
@@ -4071,17 +4069,17 @@ namespace LeagueSharp.Common
             #region SellItemAns - 4.21
 
             /// <summary>
-            ///     Packet received on selling item.
+            /// Packet received on selling item.
             /// </summary>
             public class SellItemAns
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xD3;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -4092,44 +4090,44 @@ namespace LeagueSharp.Common
 
                     result.NetworkId = packet.ReadInteger(2);
                     result.InventorySlot = packet.ReadByte();
-                    result.SpellSlot = (SpellSlot) (result.InventorySlot + (byte) SpellSlot.Item1);
+                    result.SpellSlot = (SpellSlot)(result.InventorySlot + (byte)SpellSlot.Item1);
                     result.Stack = packet.ReadByte();
                     result.UnknownByte = packet.ReadByte();
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit sells an item.
+                /// Represents the packet received when a unit sells an item.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The inventory slot
+                    /// The inventory slot
                     /// </summary>
                     public byte InventorySlot;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The spell slot
+                    /// The spell slot
                     /// </summary>
                     public SpellSlot SpellSlot;
 
                     /// <summary>
-                    ///     The stack
+                    /// The stack
                     /// </summary>
                     public int Stack;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public AIHeroClient Unit;
 
                     /// <summary>
-                    ///     An unknown byte
+                    /// An unknown byte
                     /// </summary>
                     public byte UnknownByte;
                 }
@@ -4140,17 +4138,17 @@ namespace LeagueSharp.Common
             #region SwapItemAns - 4.21
 
             /// <summary>
-            ///     Packet received on swapping item.
+            /// Packet received on swapping item.
             /// </summary>
             public class SwapItemAns
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x09;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -4161,44 +4159,44 @@ namespace LeagueSharp.Common
 
                     result.NetworkId = packet.ReadInteger(2);
                     result.FromInventorySlot = packet.ReadByte();
-                    result.FromSpellSlot = (SpellSlot) (result.FromInventorySlot + (byte) SpellSlot.Item1);
+                    result.FromSpellSlot = (SpellSlot)(result.FromInventorySlot + (byte)SpellSlot.Item1);
                     result.ToInventorySlot = packet.ReadByte();
-                    result.ToSpellSlot = (SpellSlot) (result.ToInventorySlot + (byte) SpellSlot.Item1);
+                    result.ToSpellSlot = (SpellSlot)(result.ToInventorySlot + (byte)SpellSlot.Item1);
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit swaps an item.
+                /// Represents the packet received when a unit swaps an item.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The previous inventory slot
+                    /// The previous inventory slot
                     /// </summary>
                     public byte FromInventorySlot;
 
                     /// <summary>
-                    ///     The previous spell slot
+                    /// The previous spell slot
                     /// </summary>
                     public SpellSlot FromSpellSlot;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The new inventory slot
+                    /// The new inventory slot
                     /// </summary>
                     public byte ToInventorySlot;
 
                     /// <summary>
-                    ///     The new spell slot
+                    /// The new spell slot
                     /// </summary>
                     public SpellSlot ToSpellSlot;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public AIHeroClient Unit;
                 }
@@ -4209,17 +4207,17 @@ namespace LeagueSharp.Common
             #region ChangeSpellSlot - This packet doesnt seem to exits in 4.21 with this struct
 
             /// <summary>
-            ///     Packet received on spell slot changing.
+            /// Packet received on spell slot changing.
             /// </summary>
             public class ChangeSpellSlot
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x17;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -4229,8 +4227,8 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.NetworkId = packet.ReadInteger(1);
-                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.NetworkId);
-                    result.Slot = (SpellSlot) packet.ReadByte();
+                    result.Unit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.NetworkId);
+                    result.Slot = (SpellSlot)(packet.ReadByte());
                     result.UnknownByte = packet.ReadByte(); // 0, 1C, 48
                     result.UnknownByte2 = packet.ReadByte(); //usually 2
                     result.SpellString = packet.ReadString(11);
@@ -4238,7 +4236,7 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Encodes the specified p structure.
+                /// Encodes the specified p structure.
                 /// </summary>
                 /// <param name="pStruct">The p structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -4246,7 +4244,7 @@ namespace LeagueSharp.Common
                 {
                     var packet = new GamePacket(Header);
                     packet.WriteInteger(pStruct.NetworkId);
-                    packet.WriteByte((byte) pStruct.Slot);
+                    packet.WriteByte((byte)pStruct.Slot);
                     packet.WriteByte(pStruct.UnknownByte);
                     packet.WriteByte(2);
                     packet.WriteByte(0, 3);
@@ -4255,37 +4253,37 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a spell slot is changed.
+                /// Represents the packet received when a spell slot is changed.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The slot
+                    /// The slot
                     /// </summary>
                     public SpellSlot Slot;
 
                     /// <summary>
-                    ///     The spell string
+                    /// The spell string
                     /// </summary>
                     public string SpellString;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public Obj_AI_Base Unit;
 
                     /// <summary>
-                    ///     An unknown byte. Possibly the previous slot.
+                    /// An unknown byte. Possibly the previous slot.
                     /// </summary>
                     public byte UnknownByte; // from slot?
 
                     /// <summary>
-                    ///     An unknown byte2
+                    /// An unknown byte2
                     /// </summary>
                     public byte UnknownByte2;
                 }
@@ -4296,17 +4294,17 @@ namespace LeagueSharp.Common
             #region AddGold
 
             /// <summary>
-            ///     Packet received on gold change.
+            /// Packet received on gold change.
             /// </summary>
             public class AddGold
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x22;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -4316,16 +4314,15 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.ReceivingNetworkId = packet.ReadInteger(5);
-                    result.ReceivingUnit =
-                        ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.ReceivingNetworkId);
+                    result.ReceivingUnit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.ReceivingNetworkId);
                     result.SourceNetworkId = packet.ReadInteger();
-                    result.SourceUnit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint) result.SourceNetworkId);
+                    result.SourceUnit = ObjectManager.GetUnitByNetworkId<Obj_AI_Base>((uint)result.SourceNetworkId);
                     result.Gold = packet.ReadFloat();
                     return result;
                 }
 
                 /// <summary>
-                ///     Encodes the specified p structure.
+                /// Encodes the specified p structure.
                 /// </summary>
                 /// <param name="pStruct">The p structure.</param>
                 /// <returns>GamePacket.</returns>
@@ -4340,32 +4337,32 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit's gold is changed.
+                /// Represents the packet received when a unit's gold is changed.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The gold
+                    /// The gold
                     /// </summary>
                     public float Gold;
 
                     /// <summary>
-                    ///     The receiving network identifier
+                    /// The receiving network identifier
                     /// </summary>
                     public int ReceivingNetworkId;
 
                     /// <summary>
-                    ///     The receiving unit
+                    /// The receiving unit
                     /// </summary>
                     public Obj_AI_Base ReceivingUnit;
 
                     /// <summary>
-                    ///     The source network identifier
+                    /// The source network identifier
                     /// </summary>
                     public int SourceNetworkId;
 
                     /// <summary>
-                    ///     The source unit
+                    /// The source unit
                     /// </summary>
                     public Obj_AI_Base SourceUnit;
                 }
@@ -4376,17 +4373,17 @@ namespace LeagueSharp.Common
             #region LevelUp - 4.21
 
             /// <summary>
-            ///     Received on hero level up.
+            /// Received on hero level up.
             /// </summary>
             public class LevelUp
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xCB;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -4396,7 +4393,7 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.NetworkId = packet.ReadInteger(2);
-                    result.Unit = ObjectManager.GetUnitByNetworkId<AIHeroClient>((uint) result.NetworkId);
+                    result.Unit = ObjectManager.GetUnitByNetworkId<AIHeroClient>((uint)result.NetworkId);
                     result.Level = packet.ReadByte();
                     result.PointsLeft = packet.ReadByte();
 
@@ -4404,27 +4401,27 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit levels up.
+                /// Represents the packet received when a unit levels up.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The new level
+                    /// The new level
                     /// </summary>
                     public int Level;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The amount points left to level up other spells.
+                    /// The amount points left to level up other spells.
                     /// </summary>
                     public int PointsLeft;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public AIHeroClient Unit;
                 }
@@ -4435,17 +4432,17 @@ namespace LeagueSharp.Common
             #region LevelUpSpell - 4.2.1
 
             /// <summary>
-            ///     Received on hero level up spell.
+            /// Received on hero level up spell.
             /// </summary>
             public class LevelUpSpell
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xA9;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -4455,40 +4452,40 @@ namespace LeagueSharp.Common
                     var result = new Struct();
 
                     result.NetworkId = packet.ReadInteger(2);
-                    result.Unit = ObjectManager.GetUnitByNetworkId<AIHeroClient>((uint) result.NetworkId);
-                    result.Slot = (SpellSlot) packet.ReadByte();
+                    result.Unit = ObjectManager.GetUnitByNetworkId<AIHeroClient>((uint)result.NetworkId);
+                    result.Slot = (SpellSlot)packet.ReadByte();
                     result.PointsLeft = packet.ReadByte();
                     result.Level = packet.ReadByte();
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a unit levels up a spell.
+                /// Represents the packet received when a unit levels up a spell.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The new level
+                    /// The new level
                     /// </summary>
                     public int Level;
 
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The amount points left to level up other spells.
+                    /// The amount points left to level up other spells.
                     /// </summary>
                     public int PointsLeft;
 
                     /// <summary>
-                    ///     The unit
+                    /// The unit
                     /// </summary>
                     public AIHeroClient Unit;
 
                     /// <summary>
-                    ///     The slot
+                    /// The slot
                     /// </summary>
                     public SpellSlot Slot;
                 }
@@ -4499,17 +4496,17 @@ namespace LeagueSharp.Common
             #region Surrender
 
             /// <summary>
-            ///     Received when someone casts a surrender vote.
+            /// Received when someone casts a surrender vote.
             /// </summary>
             public class Surrender
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xC9;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -4522,7 +4519,7 @@ namespace LeagueSharp.Common
                         YesVotes = packet.ReadByte(10),
                         NoVotes = packet.ReadByte(11),
                         MaxVotes = packet.ReadByte(12),
-                        Team = (GameObjectTeam) packet.ReadByte(13)
+                        Team = (GameObjectTeam)packet.ReadByte(13)
                     };
 
                     //byte unknown = packet.ReadByte(5); //Not sure what this is
@@ -4531,32 +4528,32 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received a player votes on a surrender.
+                /// Represents the packet received a player votes on a surrender.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The network identifier
+                    /// The network identifier
                     /// </summary>
                     public int NetworkId;
 
                     /// <summary>
-                    ///     The amount of yes votes
+                    /// The amount of yes votes
                     /// </summary>
                     public int YesVotes;
 
                     /// <summary>
-                    ///     The amount of no votes
+                    /// The amount of no votes
                     /// </summary>
                     public int NoVotes;
 
                     /// <summary>
-                    ///     The maximum votes
+                    /// The maximum votes
                     /// </summary>
                     public int MaxVotes;
 
                     /// <summary>
-                    ///     The team that is surrendering
+                    /// The team that is surrendering
                     /// </summary>
                     public GameObjectTeam Team;
                 }
@@ -4567,17 +4564,17 @@ namespace LeagueSharp.Common
             #region SurrenderResult
 
             /// <summary>
-            ///     Received when surrender voting is over.
+            /// Received when surrender voting is over.
             /// </summary>
             public class SurrenderResult
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xA5;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
@@ -4589,34 +4586,34 @@ namespace LeagueSharp.Common
                         TooEarly = Convert.ToBoolean(packet.ReadByte(5)),
                         YesVotes = packet.ReadByte(9),
                         NoVotes = packet.ReadByte(10),
-                        Team = (GameObjectTeam) packet.ReadByte(11)
+                        Team = (GameObjectTeam)packet.ReadByte(11)
                     };
 
                     return result;
                 }
 
                 /// <summary>
-                ///     Represents the packet received when a team finishes their decision on a surrender.
+                /// Represents the packet received when a team finishes their decision on a surrender.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     <c>true</c> if the request to surrender was denied because it was too early in the game.
+                    /// <c>true</c> if the request to surrender was denied because it was too early in the game.
                     /// </summary>
                     public bool TooEarly;
 
                     /// <summary>
-                    ///     The amount of yes votes
+                    /// The amount of yes votes
                     /// </summary>
                     public int YesVotes;
 
                     /// <summary>
-                    ///     The amount of no votes
+                    /// The amount of no votes
                     /// </summary>
                     public int NoVotes;
 
                     /// <summary>
-                    ///     The team that is surrendering.
+                    /// The team that is surrendering.
                     /// </summary>
                     public GameObjectTeam Team;
                 }
@@ -4627,27 +4624,27 @@ namespace LeagueSharp.Common
             #region RefundToken - 4.21
 
             /// <summary>
-            ///     Refund token contains refund amount, when leaving base or casting spell/item it's set to 0.
+            /// Refund token contains refund amount, when leaving base or casting spell/item it's set to 0.
             /// </summary>
             public static class RefundToken
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0xE9;
 
                 /// <summary>
-                ///     Decodes the specified data.
+                /// Decodes the specified data.
                 /// </summary>
                 /// <param name="data">The data.</param>
                 /// <returns>Struct.</returns>
                 public static Struct Decoded(byte[] data)
                 {
-                    return new Struct {RefundCount = data[6]};
+                    return new Struct { RefundCount = data[6] };
                 }
 
                 /// <summary>
-                ///     Encodes the specified undo amount.
+                /// Encodes the specified undo amount.
                 /// </summary>
                 /// <param name="undoAmount">The undo amount.</param>
                 /// <returns>GamePacket.</returns>
@@ -4661,12 +4658,12 @@ namespace LeagueSharp.Common
                 }
 
                 /// <summary>
-                ///     Represents the packet received when refunding an item.
+                /// Represents the packet received when refunding an item.
                 /// </summary>
                 public struct Struct
                 {
                     /// <summary>
-                    ///     The refund count
+                    /// The refund count
                     /// </summary>
                     public int RefundCount;
                 }
@@ -4677,14 +4674,14 @@ namespace LeagueSharp.Common
             #region Camera - 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Received by the server when Camera or Zoom is sent.
+            /// Received by the server when Camera or Zoom is sent.
             /// </summary>
             public static class Camera
             {
                 //94 00 00 00 00 00 27 
                 //last byte is probably times camera packet has been sent
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x94;
             }
@@ -4694,12 +4691,12 @@ namespace LeagueSharp.Common
             #region RefundConfirm - 4.21 (NO STRUCT)
 
             /// <summary>
-            ///     Received by the server when refund is sent.
+            /// Received by the server when refund is sent.
             /// </summary>
             public static class RefundConfirm
             {
                 /// <summary>
-                ///     The header
+                /// The header
                 /// </summary>
                 public static byte Header = 0x49;
             }
