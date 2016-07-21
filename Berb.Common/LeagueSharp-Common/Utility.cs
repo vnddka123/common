@@ -331,9 +331,9 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Checks if CastState is SuccessfullyCasted
         /// </summary>
-        public static bool IsCasted(this Spell.CastStates state)
+        public static bool IsCasted(this bool state)
         {
-            return state == Spell.CastStates.SuccessfullyCasted;
+            return state;
         }
 
         /// <summary>

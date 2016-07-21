@@ -28,6 +28,7 @@ using System.Linq;
 using EloBuddy;
 //using EloBuddy.SDK;
 using SharpDX;
+using EloBuddy.SDK.Enumerations;
 
 #endregion
 
