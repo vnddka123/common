@@ -21,7 +21,7 @@ namespace LeagueSharp.Common
             Slot = slot;
             Range = range;
             DamageType = damageType;
-            MinHitChance = EloBuddy.SDK.Enumerations.HitChance.Medium;
+            MinHitChance = EloBuddy.SDK.Enumerations.HitChance.Low;
         }
 
         public int ChargingStartedTime { get; protected set; }
@@ -322,7 +322,7 @@ namespace LeagueSharp.Common
             return HeroManager.Enemies.Select(e => GetPrediction(e)).Count(p => p.HitChance >= hitChance);
         }
 
-        public bool _cast(Obj_AI_Base unit, bool packetCast = false, bool aoe = false, bool exactHitChance = false, int minTargets = -1)
+        public bool _cast(Obj_AI_Base unit)
         {
             if (charge != null && IsChargedSpell && charge.GetPrediction(unit).HitChance >= MinHitChance)
             {
@@ -387,7 +387,7 @@ namespace LeagueSharp.Common
 
         public bool Cast(Obj_AI_Base unit, bool packetCast = false, bool aoe = false)
         {
-            return _cast(unit, packetCast, aoe);
+            return _cast(unit);
         }
 
         public bool Cast(bool packetCast = false)
@@ -422,14 +422,14 @@ namespace LeagueSharp.Common
         {
             var currentHitchance = MinHitChance;
             MinHitChance = hitChance;
-            var castResult = _cast(unit, packetCast, false, false);
+            var castResult = _cast(unit);
             MinHitChance = currentHitchance;
             return castResult;
         }
 
         public bool CastIfWillHit(Obj_AI_Base unit, int minTargets = 5, bool packetCast = false)
         {
-            var castResult = _cast(unit, packetCast, true, false, minTargets);
+            var castResult = _cast(unit);
             return castResult;
         }
 
