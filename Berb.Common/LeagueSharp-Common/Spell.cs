@@ -420,17 +420,40 @@ namespace LeagueSharp.Common
 
         public bool CastIfHitchanceEquals(Obj_AI_Base unit, EloBuddy.SDK.Enumerations.HitChance hitChance, bool packetCast = false)
         {
-            var currentHitchance = MinHitChance;
-            MinHitChance = hitChance;
-            var castResult = _cast(unit);
-            MinHitChance = currentHitchance;
-            return castResult;
+            if (charge != null && IsChargedSpell)
+            {
+                charge.CastMinimumHitchance(unit, hitChance);
+                return true;
+            }
+            else if (skillshot != null && IsSkillshot)
+            {
+                skillshot.CastMinimumHitchance(unit, hitChance);
+                return true;
+            }
+            else
+            {
+                Player.CastSpell(Slot, unit);
+                return true;
+            }
         }
 
         public bool CastIfWillHit(Obj_AI_Base unit, int minTargets = 5, bool packetCast = false)
         {
-            var castResult = _cast(unit);
-            return castResult;
+            if (charge != null && IsChargedSpell)
+            {
+                charge.CastIfItWillHit(minTargets);
+                return true;
+            }
+            else if (skillshot != null && IsSkillshot)
+            {
+                skillshot.CastIfItWillHit(minTargets);
+                return true;
+            }
+            else
+            {
+                Player.CastSpell(Slot, unit);
+                return true;
+            }
         }
 
         public float GetHealthPrediction(Obj_AI_Base unit)
