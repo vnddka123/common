@@ -242,9 +242,13 @@ namespace LeagueSharp.Common
                 {
                     return skillshot.CastDelay;
                 }
-                else
+                else if (charge != null)
                 {
                     return charge.CastDelay;
+                }
+                else
+                {
+                    return _delay;
                 }
             }
             set
@@ -253,7 +257,7 @@ namespace LeagueSharp.Common
                 {
                     skillshot.CastDelay = (int)(value * 1000);
                 }
-                else
+                else if (charge != null)
                 {
                     charge.CastDelay = (int)(value * 1000);
                 }
@@ -268,9 +272,13 @@ namespace LeagueSharp.Common
                 {
                     return skillshot.Width;
                 }
-                else
+                else if (charge != null)
                 {
                     return charge.Width;
+                }
+                else
+                {
+                    return _width;
                 }
             }
             set
@@ -279,12 +287,16 @@ namespace LeagueSharp.Common
                 {
                     skillshot.Width = (int)(value);
                 }
-                else
+                else if (charge != null)
                 {
                     charge.Width = (int)(value);
                 }
             }
         }
+
+        public static float _width;
+        public static float _speed;
+        public static float _delay;
 
         public float Speed
         {
@@ -294,9 +306,13 @@ namespace LeagueSharp.Common
                 {
                     return skillshot.Speed;
                 }
-                else
+                else if (charge != null)
                 {
                     return charge.Speed;
+                }
+                else
+                {
+                    return _speed;
                 }
             }
             set
@@ -305,7 +321,7 @@ namespace LeagueSharp.Common
                 {
                     skillshot.Speed = (int)(value);
                 }
-                else
+                else if (charge != null)
                 {
                     charge.Speed = (int)(value);
                 }
