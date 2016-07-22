@@ -324,11 +324,11 @@ namespace LeagueSharp.Common
 
         public bool _cast(Obj_AI_Base unit, bool packetCast = false, bool aoe = false, bool exactHitChance = false, int minTargets = -1)
         {
-            if (charge != null && IsChargedSpell)
+            if (charge != null && IsChargedSpell && charge.GetPrediction(unit).HitChance >= MinHitChance)
             {
                 if (Collision)
                 {
-                    if (charge.GetPrediction(unit).CollisionObjects.Count() < 1)
+                    if (charge.GetPrediction(unit).HitChance != EloBuddy.SDK.Enumerations.HitChance.Collision)
                     {
                         Player.CastSpell(Slot, charge.GetPrediction(unit).CastPosition);
                     }
@@ -339,12 +339,11 @@ namespace LeagueSharp.Common
                 }
                 return true;
             }
-
-            if (skillshot != null && IsSkillshot)
+            else if (skillshot != null && IsSkillshot && skillshot.GetPrediction(unit).HitChance >= MinHitChance)
             {
                 if (Collision)
                 {
-                    if (skillshot.GetPrediction(unit).CollisionObjects.Count() < 1)
+                    if (skillshot.GetPrediction(unit).HitChance != EloBuddy.SDK.Enumerations.HitChance.Collision)
                     {
                         Player.CastSpell(Slot, skillshot.GetPrediction(unit).CastPosition);
                     }
@@ -355,32 +354,17 @@ namespace LeagueSharp.Common
                 }
                 return true;
             }
-
-            if (targeted != null && IsTargeted)
+            else
             {
                 Player.CastSpell(Slot, unit);
                 return true;
             }
-
-            return true;
         }
 
         public bool Cast(Vector3 position, bool packetCast = false)
         {
             LastCastAttemptT = Utils.TickCount;
-
-            if (charge != null && IsChargedSpell)
-            {
-                Player.CastSpell(Slot, position);
-                return true;
-            }
-
-            if (skillshot != null && IsSkillshot)
-            {
-                Player.CastSpell(Slot, position);
-                return true;
-            }
-
+            Player.CastSpell(Slot, position);
             return true;
         }
 
