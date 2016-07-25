@@ -342,13 +342,27 @@ namespace LeagueSharp.Common
         {
             if (charge != null && IsChargedSpell && charge.GetPrediction(unit).HitChance >= MinHitChance)
             {
-                this.charge.Cast(unit);
-                return true;
+                if (this.charge.Cast(unit))
+                {
+                    return true;
+                }
+                else if (Player.CastSpell(Slot, charge.GetPrediction(unit).CastPosition))
+                {
+                    return true;
+                }
+                return false;
             }
             else if (skillshot != null && IsSkillshot && skillshot.GetPrediction(unit).HitChance >= MinHitChance)
             {
-                this.skillshot.Cast(unit);
-                return true;
+                if (this.skillshot.Cast(unit))
+                {
+                    return true;
+                }
+                else if (Player.CastSpell(Slot, skillshot.GetPrediction(unit).CastPosition))
+                {
+                    return true;
+                }
+                return false;
             }
             else
             {
