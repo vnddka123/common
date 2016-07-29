@@ -340,7 +340,7 @@ namespace LeagueSharp.Common
 
         public bool _cast(Obj_AI_Base unit)
         {
-            if (charge != null && IsChargedSpell && charge.GetPrediction(unit).HitChance >= MinHitChance)
+            if (charge != null && IsChargedSpell && charge.GetPrediction(unit).HitChance >= MinHitChance && charge.IsInRange(unit))
             {
                 if (Collision)
                 {
@@ -355,7 +355,7 @@ namespace LeagueSharp.Common
                 }
                 return true;
             }
-            else if (skillshot != null && IsSkillshot && skillshot.GetPrediction(unit).HitChance >= MinHitChance)
+            else if (skillshot != null && IsSkillshot && skillshot.GetPrediction(unit).HitChance >= MinHitChance && skillshot.IsInRange(unit))
             {
                 if (this.skillshot.Cast(unit))
                 {
