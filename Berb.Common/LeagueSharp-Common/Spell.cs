@@ -342,15 +342,18 @@ namespace LeagueSharp.Common
         {
             if (charge != null && IsChargedSpell && charge.GetPrediction(unit).HitChance >= MinHitChance)
             {
-                if (this.charge.Cast(unit))
+                if (Collision)
                 {
-                    return true;
+                    if (charge.GetPrediction(unit).HitChance != EloBuddy.SDK.Enumerations.HitChance.Collision)
+                    {
+                        Player.CastSpell(Slot, charge.GetPrediction(unit).CastPosition);
+                    }
                 }
-                else if (Player.CastSpell(Slot, charge.GetPrediction(unit).CastPosition))
+                else
                 {
-                    return true;
+                    Player.CastSpell(Slot, charge.GetPrediction(unit).CastPosition);
                 }
-                return false;
+                return true;
             }
             else if (skillshot != null && IsSkillshot && skillshot.GetPrediction(unit).HitChance >= MinHitChance)
             {
