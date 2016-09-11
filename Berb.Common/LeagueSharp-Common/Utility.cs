@@ -380,7 +380,7 @@ namespace LeagueSharp.Common
             book.LevelSpell(slot);
         }
 
-        public static List<Vector2> CutPath(this List<Vector2> path, float distance)
+        public static List<Vector2> CutPathLS(this List<Vector2> path, float distance)
         {
             var result = new List<Vector2>();
             var Distance = distance;
